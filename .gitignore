@@ -1,0 +1,30 @@
+# 忽略dc文件夹
+dc/
+
+# 忽略ptpx文件夹
+ptpx/
+
+# 忽略prj文件夹
+prj/
+
+# 常见的临时文件和日志文件
+*.log
+*.tmp
+*.temp
+
+# 编译生成的文件
+*.o
+*.obj
+*.exe
+*.out
+
+# 编辑器临时文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db 
