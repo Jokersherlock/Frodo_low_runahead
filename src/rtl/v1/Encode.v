@@ -1,3 +1,4 @@
+
 module Encode (
     input              clk,           
     input              rstn,         
