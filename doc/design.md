@@ -288,10 +288,8 @@ for i in range(n):#n=1344,976,640
         R3 = R1*hash_in+R2
         addr_2 = addr_2 + 1
         addr_3 = addr_3 + 1
-        hash_dout_en = 1
+        hash_dout_en = 1左乘和右乘只有地址增加模式不同
 ```
-
-左乘和右乘只有地址增加模式不同
 
 还没写,注意一下
 
@@ -304,3 +302,16 @@ for i in range(16):
 
 ## ABSORB_S
 
+# 4. 微指令
+
+AGU： [3:0]addr_clr,[3:0]addr_add,[2:0]addr_carry
+
+Macs: macs_en
+
+keccak: di_valid,ex_en,ram_reset,dout_en
+
+2位,输入行号控制
+
+[2:0] upc_st,upc_up
+
+wait

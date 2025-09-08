@@ -6,9 +6,13 @@ module AGU (
     input [1:0]     R0_mode,
     input [2:0]     R3_mode,
     input           R1_mode,
+    input           R2_mode,
     input  [3:0]    addr_clr,
     input  [3:0]    addr_add,
-    input           addr1_carry,//addr2是否进位
+    input  [2:0]    addr_carry,//0,1,2分别表示addr1,addr2,addr3是否进位
+    // input           addr1_carry,//addr1是否进位
+    // input           addr2_carry,//addr2是否进位
+    // input           addr3_carry,//addr3是否进位
     output reg  [16:0]  addr_0,addr_1,addr_2,addr_3
 );
 
@@ -89,7 +93,7 @@ module AGU (
         else if(addr_clr[1])begin
             addr_1 <= addr_start_1;
         end
-        else if(addr1_carry)begin
+        else if(addr_carry[0])begin
             addr_1[16:3] <= addr_1[16:3] + 1'b1;
         end
         else if(addr_add[1])begin
@@ -112,8 +116,19 @@ module AGU (
         else if(addr_clr[2])begin
             addr_2 <= addr_start_2;
         end
-        else if(addr_add[2])begin
+        else if(addr_carry[1])begin
             addr_2[16:3] <= addr_2[16:3] + 1'b1;
+        end
+        else if(addr_add[2])begin
+            //addr_2[16:3] <= addr_2[16:3] + 1'b1;
+            case (R2_mode)
+                1'b0: begin
+                    addr_2[16:3] <= addr_2[16:3] + 1'b1;
+                end
+                1'b1:begin
+                    addr_2[2:1] <= addr_2[2:1] + 1'b1;
+                end
+            endcase
         end
     end
 
@@ -124,11 +139,19 @@ module AGU (
     localparam GENS    = 3'b011;//生成S,S'
     localparam GENEP   = 3'b100;//生成E'
     localparam MATRAN  = 3'b101;//矩阵转置
+    localparam AMATMUL = 3'b110;//A矩阵乘法
     reg [10:0] R3_cnt;//R3计数器
     always @(posedge clk or negedge rstn) begin
         if(!rstn)begin
             addr_3 <= 16'b0;
             R3_cnt <= 11'b0;
+        end
+        else if(addr_clr[3])begin
+            addr_3 <= addr_start_3;
+            R3_cnt <= 11'b0;
+        end
+        else if(addr_carry[2])begin
+            addr_3[16:3] <= addr_3[16:3] + 1'b1;
         end
         else if(addr_add[3])begin
             case (R3_mode)
@@ -172,6 +195,9 @@ module AGU (
                         addr_3[16:4] <= addr_3[16:4] + 1'b1;
                         R3_cnt <= R3_cnt + 1'b1;
                     end
+                end
+                AMATMUL: begin
+                    addr_3[2:1] <= addr_3[2:1] + 1'b1;
                 end
                 default: begin
                     addr_3 <= addr_3 + 1'b1;
