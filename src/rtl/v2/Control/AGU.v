@@ -8,7 +8,7 @@ module AGU (
     input           R1_mode,
     input  [3:0]    addr_clr,
     input  [3:0]    addr_add,
-    input  [3:0]    add_cen,//低位地址加是否进位
+    input           addr1_carry,//addr2是否进位
     output reg  [16:0]  addr_0,addr_1,addr_2,addr_3
 );
 
@@ -89,15 +89,15 @@ module AGU (
         else if(addr_clr[1])begin
             addr_1 <= addr_start_1;
         end
+        else if(addr1_carry)begin
+            addr_1[16:3] <= addr_1[16:3] + 1'b1;
+        end
         else if(addr_add[1])begin
             case (R1_mode)
                 1'b0: begin
                     addr_1[16:3] <= addr_1[16:3] + 1'b1;
                 end
                 1'b1:begin
-                    if(add_cen[1] & addr_1[2])begin
-                        addr_1[16:3] <= addr_1[16:3] + 1'b1;
-                    end
                     addr_1[2] <= ~addr_1[2];
                 end
             endcase
@@ -123,6 +123,7 @@ module AGU (
     localparam WRITE8  = 3'b010;//8位对齐+1
     localparam GENS    = 3'b011;//生成S,S'
     localparam GENEP   = 3'b100;//生成E'
+    localparam MATRAN  = 3'b101;//矩阵转置
     reg [10:0] R3_cnt;//R3计数器
     always @(posedge clk or negedge rstn) begin
         if(!rstn)begin
@@ -158,6 +159,17 @@ module AGU (
                     end
                     else begin
                         addr_3[14:4] <= addr_3[14:4] + 1'b1;
+                        R3_cnt <= R3_cnt + 1'b1;
+                    end
+                end
+                MATRAN: begin
+                    if(R3_cnt == 11'd8)begin//一行8个全部读完
+                        addr_3[3:1] <= addr_3[3:1] + 1'b1;
+                        addr_3[16:4] <= addr_start_3[16:4];
+                        R3_cnt <= 11'b0;
+                    end
+                    else begin//128位对齐实现行跳转
+                        addr_3[16:4] <= addr_3[16:4] + 1'b1;
                         R3_cnt <= R3_cnt + 1'b1;
                     end
                 end

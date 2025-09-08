@@ -118,5 +118,189 @@ R0为最常用读寄存器,可64位,16位,8位对齐读取
 
 低3(?)位地址单独控制，可选是否进位
 
-# 3. 微指令
+# 3. 微程序
+
+## TRANS
+
+**功能** 执行encode或者decode
+
+R0_agu_mode = 2'b01(16位对齐加)
+
+R3_agu_mode = 3'b001(16位对齐加)
+
+R3_en = 2'b10(写16位)
+
+读R0的数据,写至R3
+
+```python
+for i in range(4):
+    for j in range(n): #1344为4,976为3,640为2
+    	load_en = 1
+    for k in range(16):
+        consume_en = 1
+```
+
+```python
+for i in range(4):
+    for j in range(16):
+    	load_en = 1
+    for k in range(n):
+        consume_en = 1 #1344为4,976为3,640为2
+```
+
+## MATMUL
+
+**功能** 不带**A**的矩阵乘,执行8*1344(8bit)和1344\*8(16bit)的乘法
+
+R0_agu_mode = 2'b01(16位对齐)
+
+R1_agu_mode = 1'b1(32位对齐)
+
+R3_agu_mode = 3'b000(64位对齐)
+
+R1为S的4个数据,R0为B的1个16bit数据,R2为加矩阵数据,与R3同地址
+
+```python
+for i in range(n):#n为1344,976,640
+    for j in range(8):
+        for k in range(2):
+            R3 = R1*R0+R2
+            addr_1 = addr_1 + 1
+            addr_2 = addr_2 + 1
+            addr_3 = addr_3 + 1
+        addr_0 = addr_0 + 1
+    addr_1_carry = 1
+    addr_2_clr = 1
+    addr_3_clr = 1
+```
+
+## MATRAN
+
+**功能** 对矩阵进行转置(限定大小为8*8的16bit矩阵)
+
+R0_agu_mode = 2'b01(16位对齐)
+
+R3_agu_mode = 3'b101(矩阵转置模式)
+
+能否和可能要实现的mov指令合并
+
+**转置**
+
+R0_agu_mode = 2'b01(16位对齐)
+
+R3_agu_mode = 3'b001(16位对齐)
+
+```python
+for i in range(n=64):
+    R3 = R0
+    addr0 = addr0 + 1
+    addr3 = addr3 + 1
+```
+
+**数据迁移**
+
+R0_agu_mode = 2'b00(64位对齐)
+
+R3_agu_mode = 3'b000(64位对齐)
+
+```python
+for i in range(n):#n为数据长度,n取值最大可达2688,但可分段载入
+    R3 = R0
+    addr0 = addr0 + 1
+    addr3 = addr3 + 1
+```
+
+## ABSORB
+
+R0_agu_mode 8位对齐
+
+```python
+for i in range(n):#n为bit数/8
+    hash_in = R0
+    addr0 = addr0 + 1
+```
+
+## PKH
+
+```python
+#首段剩余
+#可以使用ABSORB进行?
+for i in range(loop0):#1344,976:120,640(163)
+    hash_in = R0
+    addr0 = addr0 + 1
+#可以单独使用absorb_ex指令?
+absorb(length=1344/1088)
+
+for i in range(loop1):#1344:157,976:113,640:
+    for j in range(loop2):#1344,976:17*64/8=136
+        hash_in = R0
+        addr0 = addr0 + 1
+    absorb()
+ 
+#最后收尾处实际上也可以使用ABSORB进行
+#在现在的框架下,pkh640和其他两个只有在loop2上会在2个值之间变化
+```
+
+## SQUEEZE
+
+```python
+for i in range(n):
+    R3 = hash_out
+    addr_3 = addr_3 + 1
+```
+
+## SS
+
+在现在的地址增加逻辑下,ss和pkh除切块差异和地址mode差异外无区别
+
+## GENS与GENE
+
+与pkh和ss相比,似乎实际也只有keccak不清0,输入使能变为输出使能的区别,地址递增选择对应的模式,还有采样
+
+## AMATMUL/MATMULA
+
+```python
+for i in range(n):#n=1344,976,640
+    addr0_clr = 1
+    hash_in = line_index_low
+    hash_in = line_index_high #这俩顺序之后好好确认一下
+    for j in range(16):
+        hash_in = R0
+        addr0 = addr0 + 1
+    absorb()
+    for j in range(n/84-1):
+        for k in range(84):
+            R3 = R1*hash_in+R2
+            addr_2 = addr_2 + 1
+            addr_3 = addr_3 + 1
+            R3 = R1*hash_in+R2
+            addr_2 = addr_2 + 1
+            addr_3 = addr_3 + 1
+        hash_dout_en = 1
+        addr_1_carry = 1
+        addr_2_clr = 1
+        addr_3_clr = 1
+        squeeze()
+    for m in range(rest):
+        R3 = R1*hash_in+R2
+        addr_2 = addr_2 + 1
+        addr_3 = addr_3 + 1
+        R3 = R1*hash_in+R2
+        addr_2 = addr_2 + 1
+        addr_3 = addr_3 + 1
+        hash_dout_en = 1
+```
+
+左乘和右乘只有地址增加模式不同
+
+还没写,注意一下
+
+## MATADD
+
+```python
+for i in range(16):
+    R3 = R0 + R2 
+```
+
+## ABSORB_S
 
