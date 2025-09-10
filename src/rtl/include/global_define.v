@@ -6,4 +6,9 @@
 `define FRODO_976  2'b10
 `define FRODO_640  2'b01
 
+`define UINST_ADDR_WIDTH 8
+`define UINST_WIDTH 25
+
+`define INST_WIDTH 28
+
 `endif
