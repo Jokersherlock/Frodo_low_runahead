@@ -52,27 +52,28 @@ module Control(
     wire done;
     assign done = uinst[0];
     
+    wire [2:0] upc_st,upc_up;
+    assign upc_st = uinst[3:1];
+    assign upc_up = uinst[6:4];
+    
     wire [3:0] addr_clr;
     wire [3:0] addr_add;
     wire [2:0] addr_carry;
-    assign addr_clr = uinst[4:1];
-    assign addr_add = uinst[8:5];
-    assign addr_carry = uinst[11:9];
+    assign addr_clr = uinst[10:7];
+    assign addr_add = uinst[14:11];
+    assign addr_carry = uinst[17:15];
     
     wire macs_en;
-    assign macs_en = uinst[12];
+    assign macs_en = uinst[18];
     
     wire di_valid,ex_en,ram_reset,dout_en;
-    assign di_valid = uinst[13];
-    assign ex_en = uinst[14];
-    assign ram_reset = uinst[15];
-    assign dout_en = uinst[16];
+    assign di_valid = uinst[19];
+    assign ex_en = uinst[20];
+    assign ram_reset = uinst[21];
+    assign dout_en = uinst[22];
     
     wire stall;
-    wire [2:0] upc_up,upc_st;
-    assign stall = uinst[17];
-    assign upc_up = uinst[20:18];
-    assign upc_st = uinst[23:21];
+    assign stall = uinst[23];
 
 
     InstDecoder u_InstDecoder(
