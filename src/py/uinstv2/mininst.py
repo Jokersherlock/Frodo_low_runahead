@@ -1,9 +1,19 @@
 class MicrocodeAssembler:
     def __init__(self):
-        # 定义微指令字段结构（示例，需根据实际架构修改）
+        # 定义微指令字段结构（根据Control.v中的uinst定义）
         self.fields = {
-            'DONE'   : {'bits':1,'offset':0},  
-            
+            'DONE'      : {'bits':1,'offset':0},     # 微程序结束信号
+            'UPC_ST'    : {'bits':3,'offset':1},     # 存储pc+1至寄存器
+            'UPC_UP'    : {'bits':3,'offset':4},     # 更新pc至寄存器
+            'ADDR_CLR'  : {'bits':4,'offset':7},     # AGU清除地址
+            'ADDR_ADD'  : {'bits':4,'offset':11},    # AGU的地址增加
+            'ADDR_CARRY': {'bits':3,'offset':15},    # AGU地址进位
+            'MACS_EN'   : {'bits':1,'offset':18},    # MACS使能
+            'DI_VALID'  : {'bits':1,'offset':19},    # hash输入使能
+            'EX_EN'     : {'bits':1,'offset':20},    # hash执行使能,吸收/挤压
+            'RAM_RESET' : {'bits':1,'offset':21},    # hash ram清0
+            'DOUT_EN'   : {'bits':1,'offset':22},    # hash输出使能
+            'STALL'     : {'bits':1,'offset':23},    # 等待hash运算
         }
         self.validate_field_structure()
 
