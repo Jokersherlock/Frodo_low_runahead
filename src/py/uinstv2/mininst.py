@@ -14,6 +14,7 @@ class MicrocodeAssembler:
             'RAM_RESET' : {'bits':1,'offset':21},    # hash ram清0
             'DOUT_EN'   : {'bits':1,'offset':22},    # hash输出使能
             'STALL'     : {'bits':1,'offset':23},    # 等待hash运算
+            'MEM_WEN'   : {'bits':1,'offset':24},    # 写mem使能
         }
         self.validate_field_structure()
 

@@ -1,0 +1,208 @@
+`include "global_define.v"
+`timescale 1ns / 1ns
+module Frodo #(
+    parameter TIME = 1000
+)(
+    input clk,
+    input rstn,
+    input [1:0] level,
+    input [1:0] mode,
+    input start
+);
+    wire [63:0] mem0_rd_data_0,mem0_rd_data_1,mem1_rd_data_0,mem1_rd_data_1;
+    wire mem0_wr_en_0,mem0_wr_en_1,mem1_wr_en_0,mem1_wr_en_1;
+    wire [11:0] mem0_addr_0,mem0_addr_1,mem1_addr_0,mem1_addr_1;
+    wire [10:0] di_len;
+    wire [7:0] hash_in;
+    wire hash_lev;
+    wire di_valid;
+    wire squeeze_en;
+    wire absorb_en;
+    wire ram_reset;
+    wire hash_dout_en;
+    wire flag15to8;
+    wire [15:0] Hash_16out;
+    wire [7:0] pc;
+    wire [`INST_WIDTH-1:0] inst;
+    
+    // Bus模块相关信号
+    wire [16:0] addr_0, addr_1, addr_2, addr_3;
+    wire R0_en, R1_en, R2_en;
+    wire [1:0] R3_en;
+    wire [63:0] R0_in, R1_in, R2_in, R3_in;
+    wire [2:0] R0_mask;
+    wire R1_mask;
+    wire [7:0] R3_mask;
+    wire [63:0] R3_data;
+    wire [11:0] mem0_rd_addr_0, mem0_rd_addr_1, mem1_rd_addr_0, mem1_rd_addr_1;
+    wire [11:0] upc_addr;
+    wire [63:0] mem_wr_data;
+    wire upc_addr_en;
+    wire [1:0] level_reg;
+    wire [1:0] mode_reg;
+
+    wire keccak_ready;
+    wire sample_en;
+    wire [7:0] sample_out;
+    wire mem_wen;
+
+    Control u_Control(
+        .clk(clk),
+        .rstn(rstn),
+        .inst(inst),
+        .level(level),
+        .mode(mode),
+        .level_reg(level_reg),
+        .mode_reg(mode_reg),
+        .start(start),
+        .pc(pc),
+        .mem0_rd_data_0(mem0_rd_data_0),
+        .mem0_rd_data_1(mem0_rd_data_1),
+        .mem1_rd_data_0(mem1_rd_data_0),
+        .mem1_rd_data_1(mem1_rd_data_1),
+        .di_len(di_len),
+        .hash_in(hash_in),
+        .hash_lev(hash_lev),
+        .di_valid(di_valid),
+        .squeeze_en(squeeze_en),
+        .absorb_en(absorb_en),
+        .ram_reset(ram_reset),
+        .hash_dout_en(hash_dout_en),
+        .flag15to8(flag15to8),
+        // Bus模块相关输出
+        .addr_0(addr_0),
+        .addr_1(addr_1),
+        .addr_2(addr_2),
+        .addr_3(addr_3),
+        .R0_en(R0_en),
+        .R1_en(R1_en),
+        .R2_en(R2_en),
+        .R3_en(R3_en),
+        .R0_mask(R0_mask),
+        .R1_mask(R1_mask),
+        //.R3_mask(R3_mask),
+        .R3_data(R3_data),
+        .upc_addr(upc_addr),
+        .upc_addr_en(upc_addr_en),
+        .mem_wr_data(mem_wr_data),
+        .R0_in(R0_in),
+        .R1_in(R1_in),
+        .R2_in(R2_in),
+        .keccak_ready(keccak_ready),
+        .sample_en(sample_en),
+        .sample_out(sample_out),
+        .hash_16out(Hash_16out),
+        .mem_wen(mem_wen)
+    );
+
+    keccak u_keccak(
+        .clk(clk),
+        .rst(~rstn),
+        .di_len(di_len),
+        .Hash_in_(hash_in),
+        .Hash_lev(hash_lev),
+        .di_valid(di_valid),
+        .squeeze_en(squeeze_en),
+        .absorb_en(absorb_en),
+        .ram_reset(ram_reset),
+        .dout_en(hash_dout_en),
+        .flag15to8(flag15to8),
+        .Hash_16out(Hash_16out),
+        .keccak_ready(keccak_ready)
+    );
+
+    rom #(
+        .ADDR_WIDTH(8),
+        .DATA_WIDTH(28),
+        .MEM_DEPTH(256),
+        .HEX_FILE("../../../../../../src/sim/bin/inst.bin")
+    ) u_inst_rom(
+        .clk(clk),
+        .rstn(rstn),
+        .addr(pc),
+        .dout(inst)
+    );
+
+    Bus u_Bus(
+        .clk(clk),
+        .rstn(rstn),
+        .addr_0(addr_0),
+        .addr_1(addr_1),
+        .addr_2(addr_2),
+        .addr_3(addr_3),
+        .R0_en(R0_en),
+        .R1_en(R1_en),
+        .R2_en(R2_en),
+        .R3_en(R3_en),
+        .mem0_rd_data_0(mem0_rd_data_0),
+        .mem0_rd_data_1(mem0_rd_data_1),
+        .mem1_rd_data_0(mem1_rd_data_0),
+        .mem1_rd_data_1(mem1_rd_data_1),
+        .R0_in(R0_in),
+        .R1_in(R1_in),
+        .R2_in(R2_in),
+        .R0_mask(R0_mask),
+        .R1_mask(R1_mask),
+        .mem0_addr_0(mem0_rd_addr_0),
+        .mem0_addr_1(mem0_rd_addr_1),
+        .mem1_addr_0(mem1_rd_addr_0),
+        .mem1_addr_1(mem1_rd_addr_1),
+        .R3_mask(R3_mask),
+        .mem0_wr_en_0(mem0_wr_en_0),
+        .mem0_wr_en_1(mem0_wr_en_1),
+        .mem1_wr_en_0(mem1_wr_en_0),
+        .mem1_wr_en_1(mem1_wr_en_1),
+        .upc_addr(upc_addr),
+        .upc_addr_en(upc_addr_en)
+    );
+
+
+    dual_ram #(
+        .ADDR_WIDTH(12),
+        .DATA_WIDTH(64),
+        .MEM_DEPTH(4096),
+        .HEX_FILE("../../../../../../src/sim/hex/mem0.hex"),
+        .TIME(TIME),
+        .OUTPUT_FILE("../../../../../../src/sim/hex/mem0_output.hex")
+    ) u_mem0_ram(
+        .clk(clk),
+        .rstn(rstn),
+        .addr_a(mem0_rd_addr_0),
+        .din_a(mem_wr_data),
+        .wr_en_a(mem0_wr_en_0 & mem_wen),
+        .wr_mask_a(R3_mask),
+        .dout_a(mem0_rd_data_0),
+        .addr_b(mem0_rd_addr_1),
+        .dout_b(mem0_rd_data_1)
+    );
+
+    dual_ram #(
+        .ADDR_WIDTH(12),
+        .DATA_WIDTH(64),
+        .MEM_DEPTH(2048),
+        .HEX_FILE("../../../../../../src/sim/hex/mem1.hex"),
+        .TIME(TIME),
+        .OUTPUT_FILE("../../../../../../src/sim/hex/mem1_output.hex")
+    ) u_mem1_ram(
+        .clk(clk),
+        .rstn(rstn),
+        .addr_a(mem1_rd_addr_0),
+        .din_a(mem_wr_data),
+        .wr_en_a(mem1_wr_en_0 & mem_wen),
+        .wr_mask_a(R3_mask),
+        .dout_a(mem1_rd_data_0),
+        .addr_b(mem1_rd_addr_1),
+        .dout_b(mem1_rd_data_1)
+    );
+
+    sample u_sample(
+        .clk(clk),
+        .rst_n(rstn),
+        .en(sample_en),
+        .level(level_reg),
+        .random_string(Hash_16out),
+        .sample_out(sample_out)
+    );
+
+
+endmodule

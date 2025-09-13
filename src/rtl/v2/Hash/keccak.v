@@ -18,7 +18,7 @@ module keccak(
     output wire       Hash_ready,//整个哈希就绪，可进行新的计算
     output wire       keccak_ready,//单次计算内模块就绪，可继续进行吸收或挤压
     
-    output wire [0:63]   Hash_64out
+    output wire [0:15]   Hash_16out
 
 );
 ///////////////////////////////////////////////////FSM/////////////////////////
@@ -897,7 +897,7 @@ hash_out_buffer u_hash_out_buffer
     .ci_out(ci_out),
     .dout_en(dout_en),
     
-    .Hash_64out(Hash_64out)
+    .Hash_16out(Hash_16out)
 
 );        
         

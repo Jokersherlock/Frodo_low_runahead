@@ -10,7 +10,7 @@ module hash_out_buffer
     input wire [0:199] ci_out,
     input wire         dout_en,
     
-    output wire [0:63] Hash_64out
+    output wire [0:15] Hash_16out
 
 );
 
@@ -23,15 +23,16 @@ reg [0:1343] Hash_out_buffer;//1344
 //assign Hash_64out = dout_en ? Hash_out_buffer[0:63] : 64'd0; 
 //assign Hash_64out = Hash_out_buffer[0:63];
 //assign Hash_64out = {Hash_out_buffer[48:63],Hash_out_buffer[32:47],Hash_out_buffer[16:31],Hash_out_buffer[0:15]};
-assign Hash_64out = {Hash_out_buffer[56:63],Hash_out_buffer[48:55],Hash_out_buffer[40:47],Hash_out_buffer[32:39],Hash_out_buffer[24:31],Hash_out_buffer[16:23],Hash_out_buffer[8:15],Hash_out_buffer[0:7]};
-
+//assign Hash_64out = {Hash_out_buffer[56:63],Hash_out_buffer[48:55],Hash_out_buffer[40:47],Hash_out_buffer[32:39],Hash_out_buffer[24:31],Hash_out_buffer[16:23],Hash_out_buffer[8:15],Hash_out_buffer[0:7]};
+assign Hash_16out = {Hash_out_buffer[8:15],Hash_out_buffer[0:7]};
 
 always@(posedge clk or posedge rst)
 begin
     if(rst)
             Hash_out_buffer <= 1344'd0;
      else if(dout_en)
-            Hash_out_buffer     <=  {Hash_out_buffer[64:1343],64'd0};
+            //Hash_out_buffer     <=  {Hash_out_buffer[64:1343],64'd0};
+            Hash_out_buffer     <=  {Hash_out_buffer[16:1343],16'd0};
     else if(state == 3'd5)//向buffer里装载数�?
         begin
             if(Rnd_cnt == 5'd24)

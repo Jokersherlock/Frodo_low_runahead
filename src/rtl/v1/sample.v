@@ -38,10 +38,10 @@ module sample
 reg [2:0] ctrl;
 always @(*) begin
     case (level)
-        2'b01: ctrl = 3'b100;
-        2'b10: ctrl = 3'b010;
-        2'b11: ctrl = 3'b001;
-        2'b00: ctrl = 3'b000;
+        `FRODO_1344: ctrl = 3'b100;
+        `FRODO_976: ctrl = 3'b010;
+        `FRODO_640: ctrl = 3'b001;
+        default: ctrl = 3'b000;
     endcase
 end
 

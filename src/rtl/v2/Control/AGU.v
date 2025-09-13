@@ -2,6 +2,7 @@
 module AGU (
     input clk,
     input           rstn,
+    input [1:0]     level,
     input [16:0]    addr_start_0,addr_start_1,addr_start_2,addr_start_3,
     input [1:0]     R0_mode,
     input [2:0]     R3_mode,
@@ -19,7 +20,7 @@ module AGU (
 // addr_0
     reg [10:0] loop;
     always @(*) begin
-        case (R0_mode)
+        case (level)
             `FRODO_1344: loop = 11'd1343;
             `FRODO_976: loop = 11'd975;
             `FRODO_640: loop = 11'd639;
@@ -43,7 +44,7 @@ module AGU (
         end
         else if(addr_clr[0])begin
             addr_0 <= addr_start_0;
-            R0_cnt <= 11'b0;
+            //R0_cnt <= 11'b0;
         end
         else if(addr_add[0])begin
             case (R0_mode)
@@ -147,8 +148,15 @@ module AGU (
             R3_cnt <= 11'b0;
         end
         else if(addr_clr[3])begin
-            addr_3 <= addr_start_3;
-            R3_cnt <= 11'b0;
+            // if(R3_mode == GENS || R3_mode == GENEP)begin
+            //     //R3_cnt <= 11'b0;
+            //     addr_3[16:3] <= addr_start_3[16:3];
+            // end
+            // else begin
+            //     addr_3 <= addr_start_3;
+            //     R3_cnt <= 11'b0;
+            // end
+            addr_3[16:3] <= addr_start_3[16:3];
         end
         else if(addr_carry[2])begin
             addr_3[16:3] <= addr_3[16:3] + 1'b1;
@@ -165,12 +173,14 @@ module AGU (
                     addr_3 <= addr_3 + 1'b1;
                 end
                 GENS: begin
-                    if(addr_3[14:3] == loop)begin//地址满n时。低位地址加1
+                    if(R3_cnt == loop)begin//地址满n时。低位地址加1
                         addr_3[14:3] <= addr_start_3[14:3];
+                        R3_cnt <= 11'b0;
                         addr_3[2:0]  <= addr_3[2:0] + 1'b1;
                     end
                     else begin
                         addr_3[14:3] <= addr_3[14:3] + 1'b1;
+                        R3_cnt <= R3_cnt + 1'b1;
                     end
                 end
                 GENEP: begin

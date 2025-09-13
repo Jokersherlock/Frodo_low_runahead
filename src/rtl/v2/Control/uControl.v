@@ -18,27 +18,40 @@ module uControl (
     input      [2:0]                    upc_st,
 
     input                               flag15to8,
-    input      [2:0]                    lut_flag
+    input      [2:0]                    lut_flag,
+
+    input                               done,
+    input                               keccak_ready
 );
 
 //状态机
     reg [1:0] state_reg,state_nxt;
 
     localparam IDLE = 2'b00;//空闲状态
-    localparam RUN  = 2'b01;//运行状态
-    localparam WAIT = 2'b10;//等待hash状态
+    localparam START = 2'b01;//开始状态
+    localparam RUN  = 2'b10;//运行状态
+    localparam WAIT = 2'b11;//等待hash状态
 
 
-    reg [7:0] stall_cnt;
-
+    reg [`UINST_ADDR_WIDTH-1:0] upc_reg;
     always @(posedge clk or negedge rstn) begin
         if(!rstn)
-            stall_cnt <= 8'b0;
-        else if(state_reg == WAIT)
-            stall_cnt <= stall_cnt + 1'b1;
+            upc_reg <= `UINST_ADDR_WIDTH'b0;
         else
-            stall_cnt <= 8'b0;
+            upc_reg <= upc;
     end
+
+
+    // reg [7:0] stall_cnt;
+
+    // always @(posedge clk or negedge rstn) begin
+    //     if(!rstn)
+    //         stall_cnt <= 8'b0;
+    //     else if(state_reg == WAIT)
+    //         stall_cnt <= stall_cnt + 1'b1;
+    //     else
+    //         stall_cnt <= 8'b0;
+    // end
 
     always @(posedge clk or negedge rstn) begin
         if(!rstn)
@@ -52,14 +65,23 @@ module uControl (
         case (state_reg)
             IDLE: begin
                 if(start)
-                    state_nxt = RUN;
+                    state_nxt = START;
+                else
+                    state_nxt = IDLE;
+            end
+            START: begin
+                state_nxt = RUN;
             end
             RUN: begin
                 if(stall)
                     state_nxt = WAIT;
+                else if(done)
+                    state_nxt = IDLE;
+                else
+                    state_nxt = RUN;
             end
             WAIT: begin
-                if(stall_cnt == 8'd210)
+                if(keccak_ready)
                     state_nxt = RUN;
             end
         endcase
@@ -165,16 +187,16 @@ module uControl (
             if(upc_st[2])begin
                 case (upc_st[1:0])
                     2'b00: begin
-                        upc_reg_0 <= upc;
+                        upc_reg_0 <= upc_reg;
                     end
                     2'b01: begin
-                        upc_reg_1 <= upc;
+                        upc_reg_1 <= upc_reg;
                     end
                     2'b10: begin
-                        upc_reg_2 <= upc;
+                        upc_reg_2 <= upc_reg;
                     end
                     2'b11: begin
-                        upc_reg_3 <= upc;
+                        upc_reg_3 <= upc_reg;
                     end
                 endcase
             end
@@ -199,6 +221,9 @@ module uControl (
         upc_nxt = upc;
         case (state_reg)
             IDLE: begin
+                upc_nxt = `UINST_ADDR_WIDTH'b0;
+            end
+            START: begin
                 upc_nxt = upc_start;
             end
             RUN: begin
