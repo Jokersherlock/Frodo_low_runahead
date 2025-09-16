@@ -1,4 +1,4 @@
-// `include "global_define.v"
+`include "global_define.v"
 `timescale 1ns / 1ns
 module Frodo #(
     parameter TIME = 1000
@@ -129,6 +129,16 @@ module Frodo #(
     );
 
 
+`ifdef USE_IP_CORE
+    // 使用IP核模式
+    inst_rom u_inst_rom(
+        .clka(clk),
+        .ena(1'b1),
+        .addra(pc),
+        .douta(inst)
+    );
+`else
+    // 使用仿真模式
     rom #(
         .ADDR_WIDTH(8),
         .DATA_WIDTH(28),
@@ -139,12 +149,7 @@ module Frodo #(
         .addr(pc),
         .dout(inst)
     );
-    // inst_rom u_inst_rom(
-    //     .clka(clk),
-    //     .ena(1'b1),
-    //     .addra(pc),
-    //     .douta(inst)
-    // );
+`endif
 
     Bus u_Bus(
         .clk(clk),
@@ -182,34 +187,37 @@ module Frodo #(
     wire [7:0] mem_wen_mask;
     assign mem_wen_mask = {8{mem_wen}};
 
-    // mem0 u_mem0(
-    //     .clka(clk),
-    //     .ena(1'b1),
-    //     .wea(R3_mask&mem0_wen_mask),
-    //     .addra(mem0_rd_addr_0),
-    //     .dina(mem_wr_data),
-    //     .douta(mem0_rd_data_0),
-    //     .clkb(clk),
-    //     .enb(1'b1),
-    //     .addrb(mem0_rd_addr_1),
-    //     .doutb(mem0_rd_data_1),
-    //     .web(8'b0)
-    // );
+`ifdef USE_IP_CORE
+    // 使用IP核模式
+    mem0 u_mem0(
+        .clka(clk),
+        .ena(1'b1),
+        .wea(R3_mask&mem0_wen_mask),
+        .addra(mem0_rd_addr_0),
+        .dina(mem_wr_data),
+        .douta(mem0_rd_data_0),
+        .clkb(clk),
+        .enb(1'b1),
+        .addrb(mem0_rd_addr_1),
+        .doutb(mem0_rd_data_1),
+        .web(8'b0)
+    );
 
-    // mem1 u_mem1(
-    //     .clka(clk),
-    //     .ena(1'b1),
-    //     .wea(R3_mask&mem1_wen_mask),
-    //     .addra(mem1_rd_addr_0),
-    //     .dina(mem_wr_data),
-    //     .douta(mem1_rd_data_0),
-    //     .clkb(clk),
-    //     .enb(1'b1),
-    //     .addrb(mem1_rd_addr_1),
-    //     .doutb(mem1_rd_data_1),
-    //     .web(8'b0)
-    // );
-
+    mem1 u_mem1(
+        .clka(clk),
+        .ena(1'b1),
+        .wea(R3_mask&mem1_wen_mask),
+        .addra(mem1_rd_addr_0),
+        .dina(mem_wr_data),
+        .douta(mem1_rd_data_0),
+        .clkb(clk),
+        .enb(1'b1),
+        .addrb(mem1_rd_addr_1),
+        .doutb(mem1_rd_data_1),
+        .web(8'b0)
+    );
+`else
+    // 使用仿真模式
     dual_ram #(
         .ADDR_WIDTH(12),
         .DATA_WIDTH(64),
@@ -230,7 +238,6 @@ module Frodo #(
         .dout_b(mem0_rd_data_1)
     );
 
-
     dual_ram #(
         .ADDR_WIDTH(12),
         .DATA_WIDTH(64),
@@ -250,6 +257,7 @@ module Frodo #(
         .wr_mask_b(8'b0),
         .dout_b(mem1_rd_data_1)
     );
+`endif
 
     sample u_sample(
         .clk(clk),

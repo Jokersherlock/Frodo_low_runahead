@@ -21,7 +21,11 @@
 `define HASH_EX   4'b1010
 `define SQUEEZE_L 4'b1100
 `define ABSORB_B  4'b1101
- 
+
+// 仿真/综合模式切换宏定义
+// 注释掉下面这行使用仿真模式（dual_ram, rom模块）
+// 取消注释使用综合模式（IP核）
+// `define USE_IP_CORE
 
 
 `endif

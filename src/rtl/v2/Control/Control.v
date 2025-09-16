@@ -1,4 +1,4 @@
-// `include "global_define.v"
+`include "global_define.v"
 module Control(
     input clk,
     input rstn,
@@ -475,6 +475,16 @@ module Control(
 
     wire [`UINST_WIDTH-1:0] uinst_temp;
 
+`ifdef USE_IP_CORE
+    // 使用IP核模式
+    uinst_rom u_uinst_rom(
+        .clka(clk),
+        .ena(1'b1),
+        .addra(upc),
+        .douta(uinst_temp)
+    );
+`else
+    // 使用仿真模式
     rom #(
         .ADDR_WIDTH(`UINST_ADDR_WIDTH),
         .DATA_WIDTH(`UINST_WIDTH),
@@ -485,13 +495,7 @@ module Control(
         .addr(upc),
         .dout(uinst_temp)
     );
-
-    // uinst_rom u_uinst_rom(
-    //     .clka(clk),
-    //     .ena(1'b1),
-    //     .addra(upc),
-    //     .douta(uinst_temp)
-    // );
+`endif
 
 
 
