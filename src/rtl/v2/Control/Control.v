@@ -1,4 +1,4 @@
-`include "global_define.v"
+// `include "global_define.v"
 module Control(
     input clk,
     input rstn,
@@ -33,6 +33,10 @@ module Control(
     output     [1:0]                        R3_en,
     input     [2:0]                        R0_mask,
     input                                  R1_mask,
+    output     [31:0]                       R1_32,
+    output     [15:0]                       R0_16,
+    output     [7:0]                        R0_8,
+    output     [63:0]                       R2_out,
     //output     [7:0]                        R3_mask,
     output     [63:0]                       R3_data,
     output     [11:0]                       upc_addr,
@@ -44,8 +48,11 @@ module Control(
     input      [7:0]                      sample_out,
     input      [15:0]                     hash_16out,
 
-    output                                 mem_wen
+    output                                 mem_wen,
 
+    output                                 macs_en,
+    output                                 macs_mode,
+    output                                 macs_signal
 );
 
     //wire [`INST_WIDTH-1:0] inst;
@@ -272,8 +279,8 @@ module Control(
 //    wire [2:0] R0_mask;
 //    wire R1_mask;
     wire R0_inverse;
-    wire macs_mode;
-    wire macs_signal;
+    // wire macs_mode;
+    // wire macs_signal;
     wire [10:0] di_len;
     wire hash_in_src;
     wire hash_ex_mode;
@@ -285,11 +292,11 @@ module Control(
     wire [`UINST_ADDR_WIDTH-1:0] upc;
     wire ucontrol_start;
 
-    wire [63:0] R0_out,R1_out,R2_out,R3_out;
+    wire [63:0] R0_out,R1_out,R3_out;
     assign mem_wr_data = R3_out;
-    wire [32:0] R1_32;
-    wire [15:0] R0_16;
-    wire [7:0] R0_8;
+    // wire [32:0] R1_32;
+    // wire [15:0] R0_16;
+    // wire [7:0] R0_8;
     wire [`UINST_WIDTH-1:0] uinst;
 
     wire [16:0] addr_0,addr_1,addr_2,addr_3;
@@ -475,10 +482,18 @@ module Control(
         .HEX_FILE("../../../../../../src/sim/bin/uinst.bin")
     ) u_inst_rom(
         .clk(clk),
-        .rstn(rstn),
         .addr(upc),
         .dout(uinst_temp)
     );
+
+    // uinst_rom u_uinst_rom(
+    //     .clka(clk),
+    //     .ena(1'b1),
+    //     .addra(upc),
+    //     .douta(uinst_temp)
+    // );
+
+
 
     assign uinst = (state == EX) ? uinst_temp : `UINST_WIDTH'b0;
 

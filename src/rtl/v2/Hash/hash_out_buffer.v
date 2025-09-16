@@ -10,28 +10,55 @@ module hash_out_buffer
     input wire [0:199] ci_out,
     input wire         dout_en,
     
+    //output reg [1:0] dout_en_cnt,
+    //output wire [0:63] Hash_64out
+    //output reg [0:15] Hash_16out
     output wire [0:15] Hash_16out
-
 );
 
 reg [0:1343] Hash_out_buffer;//1344
 
 //reg [4:0]    buffer_out_cnt;
 //reg          buffer_out_en;//////连续输出使用   
-
+//wire [0:63]  Hash_64out;
 
 //assign Hash_64out = dout_en ? Hash_out_buffer[0:63] : 64'd0; 
 //assign Hash_64out = Hash_out_buffer[0:63];
 //assign Hash_64out = {Hash_out_buffer[48:63],Hash_out_buffer[32:47],Hash_out_buffer[16:31],Hash_out_buffer[0:15]};
 //assign Hash_64out = {Hash_out_buffer[56:63],Hash_out_buffer[48:55],Hash_out_buffer[40:47],Hash_out_buffer[32:39],Hash_out_buffer[24:31],Hash_out_buffer[16:23],Hash_out_buffer[8:15],Hash_out_buffer[0:7]};
 assign Hash_16out = {Hash_out_buffer[8:15],Hash_out_buffer[0:7]};
+//reg [1:0] dout_en_cnt;
+
+// always @(posedge clk or posedge rst) begin
+//     if(rst) begin
+//         dout_en_cnt <= 2'd0;
+//     end
+//     else if(dout_en) begin
+//         dout_en_cnt <= dout_en_cnt + 2'd1;
+//     end
+//     else begin
+//         dout_en_cnt <= dout_en_cnt;
+//     end
+// end
+
+// always @(*) begin
+//     case(dout_en_cnt)
+//         2'd0: Hash_16out = {Hash_64out[8:15],Hash_64out[0:7]};
+//         2'd1: Hash_16out = {Hash_64out[24:31],Hash_64out[16:23]};
+//         2'd2: Hash_16out = {Hash_64out[40:47],Hash_64out[32:39]};
+//         2'd3: Hash_16out = {Hash_64out[56:63],Hash_64out[48:55]};
+//         default: Hash_16out = 16'd0;
+//     endcase
+// end
+
+
 
 always@(posedge clk or posedge rst)
 begin
     if(rst)
             Hash_out_buffer <= 1344'd0;
      else if(dout_en)
-            //Hash_out_buffer     <=  {Hash_out_buffer[64:1343],64'd0};
+           // Hash_out_buffer     <=  {Hash_out_buffer[64:1343],64'd0};
             Hash_out_buffer     <=  {Hash_out_buffer[16:1343],16'd0};
     else if(state == 3'd5)//向buffer里装载数�?
         begin

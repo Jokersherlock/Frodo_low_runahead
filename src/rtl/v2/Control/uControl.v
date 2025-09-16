@@ -1,4 +1,4 @@
-`include "global_define.v"
+// `include "global_define.v"
 module uControl (
     input                               clk,
     input                               rstn,

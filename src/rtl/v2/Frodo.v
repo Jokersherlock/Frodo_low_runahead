@@ -1,4 +1,4 @@
-`include "global_define.v"
+// `include "global_define.v"
 `timescale 1ns / 1ns
 module Frodo #(
     parameter TIME = 1000
@@ -34,17 +34,24 @@ module Frodo #(
     wire R1_mask;
     wire [7:0] R3_mask;
     wire [63:0] R3_data;
+    wire [31:0] R1_32;
+    wire [15:0] R0_16;
+    wire [7:0] R0_8;
     wire [11:0] mem0_rd_addr_0, mem0_rd_addr_1, mem1_rd_addr_0, mem1_rd_addr_1;
     wire [11:0] upc_addr;
     wire [63:0] mem_wr_data;
     wire upc_addr_en;
     wire [1:0] level_reg;
     wire [1:0] mode_reg;
+    wire [63:0] R2_out;
 
     wire keccak_ready;
     wire sample_en;
     wire [7:0] sample_out;
     wire mem_wen;
+    wire macs_en;
+    wire macs_mode;
+    wire macs_signal;
 
     Control u_Control(
         .clk(clk),
@@ -80,6 +87,10 @@ module Frodo #(
         .R3_en(R3_en),
         .R0_mask(R0_mask),
         .R1_mask(R1_mask),
+        .R1_32(R1_32),
+        .R0_16(R0_16),
+        .R0_8(R0_8),
+        .R2_out(R2_out),
         //.R3_mask(R3_mask),
         .R3_data(R3_data),
         .upc_addr(upc_addr),
@@ -92,9 +103,15 @@ module Frodo #(
         .sample_en(sample_en),
         .sample_out(sample_out),
         .hash_16out(Hash_16out),
-        .mem_wen(mem_wen)
+        .mem_wen(mem_wen),
+        .macs_en(macs_en),
+        .macs_mode(macs_mode),
+        .macs_signal(macs_signal)
     );
 
+
+    // wire [1:0] dout_en_cnt;
+    // wire [63:0] Hash_64out;
     keccak u_keccak(
         .clk(clk),
         .rst(~rstn),
@@ -111,6 +128,7 @@ module Frodo #(
         .keccak_ready(keccak_ready)
     );
 
+
     rom #(
         .ADDR_WIDTH(8),
         .DATA_WIDTH(28),
@@ -118,10 +136,15 @@ module Frodo #(
         .HEX_FILE("../../../../../../src/sim/bin/inst.bin")
     ) u_inst_rom(
         .clk(clk),
-        .rstn(rstn),
         .addr(pc),
         .dout(inst)
     );
+    // inst_rom u_inst_rom(
+    //     .clka(clk),
+    //     .ena(1'b1),
+    //     .addra(pc),
+    //     .douta(inst)
+    // );
 
     Bus u_Bus(
         .clk(clk),
@@ -155,7 +178,37 @@ module Frodo #(
         .upc_addr(upc_addr),
         .upc_addr_en(upc_addr_en)
     );
+    
+    wire [7:0] mem_wen_mask;
+    assign mem_wen_mask = {8{mem_wen}};
 
+    // mem0 u_mem0(
+    //     .clka(clk),
+    //     .ena(1'b1),
+    //     .wea(R3_mask&mem0_wen_mask),
+    //     .addra(mem0_rd_addr_0),
+    //     .dina(mem_wr_data),
+    //     .douta(mem0_rd_data_0),
+    //     .clkb(clk),
+    //     .enb(1'b1),
+    //     .addrb(mem0_rd_addr_1),
+    //     .doutb(mem0_rd_data_1),
+    //     .web(8'b0)
+    // );
+
+    // mem1 u_mem1(
+    //     .clka(clk),
+    //     .ena(1'b1),
+    //     .wea(R3_mask&mem1_wen_mask),
+    //     .addra(mem1_rd_addr_0),
+    //     .dina(mem_wr_data),
+    //     .douta(mem1_rd_data_0),
+    //     .clkb(clk),
+    //     .enb(1'b1),
+    //     .addrb(mem1_rd_addr_1),
+    //     .doutb(mem1_rd_data_1),
+    //     .web(8'b0)
+    // );
 
     dual_ram #(
         .ADDR_WIDTH(12),
@@ -169,12 +222,14 @@ module Frodo #(
         .rstn(rstn),
         .addr_a(mem0_rd_addr_0),
         .din_a(mem_wr_data),
-        .wr_en_a(mem0_wr_en_0 & mem_wen),
-        .wr_mask_a(R3_mask),
+        .wr_mask_a(R3_mask & mem_wen_mask),
         .dout_a(mem0_rd_data_0),
         .addr_b(mem0_rd_addr_1),
+        .din_b(64'b0),
+        .wr_mask_b(8'b0),
         .dout_b(mem0_rd_data_1)
     );
+
 
     dual_ram #(
         .ADDR_WIDTH(12),
@@ -188,10 +243,11 @@ module Frodo #(
         .rstn(rstn),
         .addr_a(mem1_rd_addr_0),
         .din_a(mem_wr_data),
-        .wr_en_a(mem1_wr_en_0 & mem_wen),
-        .wr_mask_a(R3_mask),
+        .wr_mask_a(R3_mask & mem_wen_mask),
         .dout_a(mem1_rd_data_0),
         .addr_b(mem1_rd_addr_1),
+        .din_b(64'b0),
+        .wr_mask_b(8'b0),
         .dout_b(mem1_rd_data_1)
     );
 
@@ -204,5 +260,27 @@ module Frodo #(
         .sample_out(sample_out)
     );
 
+
+    // Macs u_Macs(
+    //     .clk(clk),
+    //     .rstn(rstn),
+    //     .a_0(R1_32[7:0]),
+    //     .a_1(R1_32[15:8]),
+    //     .a_2(R1_32[23:16]),
+    //     .a_3(R1_32[31:24]),
+    //     .b_0(R0_16),
+    //     .b_1(R0_16),
+    //     .b_2(R0_16),
+    //     .b_3(R0_16),
+    //     .c_0(R2_out[15:0]),
+    //     .c_1(R2_out[31:16]),
+    //     .c_2(R2_out[47:32]),
+    //     .c_3(R2_out[63:48]),
+    //     .mode(mode_reg),
+    //     .signal(signal_reg),
+    //     .en(en_reg),
+    //     .result(result_reg),
+    //     .level(level_reg)
+    // );
 
 endmodule

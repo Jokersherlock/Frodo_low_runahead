@@ -14,12 +14,13 @@ module dual_ram #(
     // 端口A（读/写端口）
     input wire [ADDR_WIDTH-1:0] addr_a,     // 端口A地址输入
     input wire [DATA_WIDTH-1:0] din_a,      // 端口A数据输入
-    input wire wr_en_a,                     // 端口A写使能
     input wire [7:0] wr_mask_a,             // 端口A写掩码（8位，支持8/16/32/64位写入）
     output reg [DATA_WIDTH-1:0] dout_a,     // 端口A数据输出（带寄存器）
     
-    // 端口B（只读端口）
+    // 端口B（读/写端口）
     input wire [ADDR_WIDTH-1:0] addr_b,     // 端口B地址输入
+    input wire [DATA_WIDTH-1:0] din_b,      // 端口B数据输入
+    input wire [7:0] wr_mask_b,             // 端口B写掩码（8位，支持8/16/32/64位写入）
     output reg [DATA_WIDTH-1:0] dout_b      // 端口B数据输出（带寄存器）
 );
 
@@ -51,8 +52,8 @@ module dual_ram #(
             // 时钟计数器递增
             clk_counter <= clk_counter + 1;
             
-            if (wr_en_a) begin
-                // 根据mask进行部分写入
+            // 根据mask进行部分写入（当mask非零时执行写操作）
+            if (wr_mask_a != 8'b00000000) begin
                 case (wr_mask_a)
                     8'b00000001: mem[addr_a][7:0]   <= din_a[7:0];     // 写8位
                     8'b00000011: mem[addr_a][15:0]  <= din_a[15:0];    // 写16位
@@ -68,6 +69,34 @@ module dual_ram #(
                         if (wr_mask_a[5]) mem[addr_a][47:40] <= din_a[47:40];
                         if (wr_mask_a[6]) mem[addr_a][55:48] <= din_a[55:48];
                         if (wr_mask_a[7]) mem[addr_a][63:56] <= din_a[63:56];
+                    end
+                endcase
+            end
+        end
+    end
+    
+    // 端口B写操作（同步写，支持mask）
+    always @(posedge clk or negedge rstn) begin
+        if (!rstn) begin
+            // 复位时不做任何操作
+        end else begin
+            // 根据mask进行部分写入（当mask非零时执行写操作）
+            if (wr_mask_b != 8'b00000000) begin
+                case (wr_mask_b)
+                    8'b00000001: mem[addr_b][7:0]   <= din_b[7:0];     // 写8位
+                    8'b00000011: mem[addr_b][15:0]  <= din_b[15:0];    // 写16位
+                    8'b00001111: mem[addr_b][31:0]  <= din_b[31:0];    // 写32位
+                    8'b11111111: mem[addr_b][63:0]  <= din_b[63:0];    // 写64位
+                    default: begin
+                        // 按位写入
+                        if (wr_mask_b[0]) mem[addr_b][7:0]   <= din_b[7:0];
+                        if (wr_mask_b[1]) mem[addr_b][15:8]  <= din_b[15:8];
+                        if (wr_mask_b[2]) mem[addr_b][23:16] <= din_b[23:16];
+                        if (wr_mask_b[3]) mem[addr_b][31:24] <= din_b[31:24];
+                        if (wr_mask_b[4]) mem[addr_b][39:32] <= din_b[39:32];
+                        if (wr_mask_b[5]) mem[addr_b][47:40] <= din_b[47:40];
+                        if (wr_mask_b[6]) mem[addr_b][55:48] <= din_b[55:48];
+                        if (wr_mask_b[7]) mem[addr_b][63:56] <= din_b[63:56];
                     end
                 endcase
             end
