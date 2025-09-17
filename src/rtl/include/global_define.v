@@ -11,11 +11,15 @@
 `define DECAP 2'b11
 
 `define UINST_ADDR_WIDTH 8
-`define UINST_WIDTH 25
+`define UINST_WIDTH 29
 
 `define INST_WIDTH 28
 
-
+`define TRANS     4'b0001
+`define MATMUL    4'b0010
+`define MOV       4'b0011
+`define AMATMUL   4'b0100
+`define MATADD    4'b0101
 `define ABSORB    4'b1000
 `define SQUEEZE   4'b1001
 `define HASH_EX   4'b1010
@@ -25,7 +29,7 @@
 // 仿真/综合模式切换宏定义
 // 注释掉下面这行使用仿真模式（dual_ram, rom模块）
 // 取消注释使用综合模式（IP核）
-// `define USE_IP_CORE
+`define USE_IP_CORE
 
 
 `endif

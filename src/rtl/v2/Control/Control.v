@@ -1,4 +1,4 @@
-`include "global_define.v"
+// `include "global_define.v"
 module Control(
     input clk,
     input rstn,
@@ -38,9 +38,10 @@ module Control(
     output     [7:0]                        R0_8,
     output     [63:0]                       R2_out,
     //output     [7:0]                        R3_mask,
-    output     [63:0]                       R3_data,
     output     [11:0]                       upc_addr,
     output                                  upc_addr_en,
+    output     [11:0]                       ex_addr,
+    output                                  ex_addr_en,
     input      [63:0]                       R0_in,R1_in,R2_in,
 
     input                                  keccak_ready,
@@ -52,7 +53,13 @@ module Control(
 
     output                                 macs_en,
     output                                 macs_mode,
-    output                                 macs_signal
+    output                                 macs_signal,
+    input      [63:0]                      macs_result,
+    output                                 load_en,
+    output                                 consume_en,
+
+    input      [15:0]                     data_encode,
+    input      [15:0]                     data_decode
 );
 
     //wire [`INST_WIDTH-1:0] inst;
@@ -263,7 +270,7 @@ module Control(
 
 
 
-
+    wire [3:0] opcode;
     wire [11:0] loop_0;
     wire [7:0] loop_1;
     wire [7:0] loop_2;
@@ -300,7 +307,6 @@ module Control(
     wire [`UINST_WIDTH-1:0] uinst;
 
     wire [16:0] addr_0,addr_1,addr_2,addr_3;
-    wire [63:0] R3_data;
     wire [2:0] R3_src;
 
 
@@ -338,14 +344,60 @@ module Control(
     wire mem_wen;
     assign mem_wen = uinst[24];
 
-    assign hash_in = hash_in_src ? inst_reg[`INST_WIDTH-1:`INST_WIDTH-8] : R0_8;
-    assign absorb_en = ~hash_ex_mode & ex_en;
-    assign squeeze_en = hash_ex_mode & ex_en;
+    wire [1:0] a_index;
+    assign a_index = uinst[26:25];
+    //wire load_en;
+    assign load_en = uinst[27];
+   // wire consume_en;
+    assign consume_en = uinst[28];
+
+    reg [15:0] A_line_index;
+
+    always @(posedge clk or negedge rstn) begin
+        if(!rstn)begin
+            A_line_index <= 16'b0;
+        end
+        else if(state == EX)begin
+            if(a_index == 2'b11)begin
+                A_line_index <= A_line_index + 1'b1;
+            end
+        end
+        else if(state == IDLE)begin
+            A_line_index <= 16'b0;
+        end
+        else if(state == FINISH)begin
+            A_line_index <= 16'b0;
+        end
+    end
+
+
+    //hash
+    assign hash_in = hash_in_src   ? inst_reg[`INST_WIDTH-1:`INST_WIDTH-8] : 
+                     (~a_index[1]) ? R0_8 :
+                       a_index[0]  ? A_line_index[15:8] : A_line_index[7:0];
+    reg di_valid_reg;
+    always @(posedge clk or negedge rstn) begin
+        if(!rstn)begin
+            di_valid_reg <= 1'b0;
+        end
+        else begin
+            di_valid_reg <= di_valid_reg;
+        end
+    end
+    //A参与的乘法,前一时刻di_valid使能,说明此时为吸收过程
+    assign absorb_en = opcode == `AMATMUL ? ex_en & di_valid_reg : ~hash_ex_mode & ex_en;
+    assign squeeze_en = opcode == `AMATMUL ? ex_en & ~di_valid_reg : hash_ex_mode & ex_en;
+       
+    // assign absorb_en = ~hash_ex_mode & ex_en;
+    // assign squeeze_en = hash_ex_mode & ex_en;
 
 
     //R3_in
     localparam HASH = 3'b000;
     localparam SAMPLE = 3'b001;
+    localparam MACS = 3'b010;
+    localparam ENCODE = 3'b011;
+    localparam DECODE = 3'b100;
     reg [63:0] R3_in;
 
     always @(*) begin
@@ -355,6 +407,15 @@ module Control(
             end
             SAMPLE:begin
                 R3_in = R3_en == 2'b01 ? {8{sample_out}} : {4{{8{sample_out[7]}},sample_out}};
+            end
+            MACS:begin
+                R3_in = macs_result;
+            end
+            ENCODE:begin
+                R3_in = {4{data_encode}};
+            end
+            DECODE:begin
+                R3_in = {4{data_decode}};
             end
             default:begin
                 R3_in = 64'b0;
@@ -368,6 +429,7 @@ module Control(
         .inst(inst),
         .level(level_reg),
         .inst_valid(inst_valid),
+        .opcode(opcode),
         .loop_0(loop_0),
         .loop_1(loop_1),
         .loop_2(loop_2),
@@ -401,6 +463,8 @@ module Control(
         .ucontrol_start(ucontrol_start),
         .upc_addr(upc_addr),
         .upc_addr_en(upc_addr_en),
+        .ex_addr(ex_addr),
+        .ex_addr_en(ex_addr_en),
         .mem0_rd_data_0(mem0_rd_data_0),
         .mem0_rd_data_1(mem0_rd_data_1),
         .mem1_rd_data_0(mem1_rd_data_0),
@@ -497,9 +561,7 @@ module Control(
     );
 `endif
 
-
-
-    assign uinst = (state == EX) ? uinst_temp : `UINST_WIDTH'b0;
+assign uinst = (state == EX) ? uinst_temp : `UINST_WIDTH'b0;
 
 
 endmodule

@@ -21,7 +21,9 @@ module Bus(
     output        mem0_wr_en_0,mem0_wr_en_1,mem1_wr_en_0,mem1_wr_en_1,
 
     input  [11:0] upc_addr,
-    input         upc_addr_en
+    input         upc_addr_en,
+    input  [11:0] ex_addr,
+    input         ex_addr_en
 );
     wire [1:0] mem_index_0,mem_index_1,mem_index_2,mem_index_3;
 
@@ -71,9 +73,10 @@ module Bus(
                           8'b11111111;  // 写64位
     assign R3_mask = R3_mask_temp;
 
-    // 根据mem_index为存储器地址输出赋值，优先级upc_addr_en>R0>R1>R2，考虑使能信号
-    // mem0_rd_addr_0: mem_index=2'b00时被选中（A口，可写）
-    assign mem0_addr_0 = (R0_en && mem_index_0 == 2'b00) ? addr_0[14:3] :
+    // 根据mem_index为存储器地址输出赋值，优先级ex_addr_en>upc_addr_en>R0>R1>R2，考虑使能信号
+    // mem0_rd_addr_0: mem_index=2'b00时被选中（A口，可写），ex_addr_en具有最高优先级
+    assign mem0_addr_0 = ex_addr_en ? ex_addr :
+                            (R0_en && mem_index_0 == 2'b00) ? addr_0[14:3] :
                             (R1_en && mem_index_1 == 2'b00) ? addr_1[14:3] :
                             (R2_en && mem_index_2 == 2'b00) ? addr_2[14:3] :
                             (R3_en != 2'b00 && mem_index_3 == 2'b00) ? addr_3[14:3] :
@@ -99,32 +102,33 @@ module Bus(
                             (R2_en && mem_index_2 == 2'b11) ? addr_2[14:3] :
                             12'b0;
 
-    // 根据mem_index选择存储器数据，优先级upc_addr_en>R0>R3>R1>R2，考虑使能信号
+    // 根据mem_index选择存储器数据，优先级ex_addr_en(仅mem0_0)>upc_addr_en(仅mem1_0)>R0>R3>R1>R2，考虑使能信号
     wire [63:0] mem_data_0, mem_data_1, mem_data_2;
     
     // 为每个地址选择对应的存储器数据，只有当使能信号有效时才选择数据
+    // 如果ex_addr_en使能且访问mem0_0端口，则其他寄存器获得0数据
     // 如果upc_addr_en使能且访问mem1_0端口，则其他寄存器获得0数据
-    assign mem_data_0 = R0_en ? ((mem_index_0 == 2'b00) ? mem0_rd_data_0 :
+    assign mem_data_0 = R0_en ? ((mem_index_0 == 2'b00) ? (ex_addr_en ? 64'b0 : mem0_rd_data_0) :
                                  (mem_index_0 == 2'b01) ? mem0_rd_data_1 :
                                  (mem_index_0 == 2'b10) ? (upc_addr_en ? 64'b0 : mem1_rd_data_0) :
                                  mem1_rd_data_1) : 64'b0;
                         
-    assign mem_data_1 = R1_en ? ((mem_index_1 == 2'b00) ? mem0_rd_data_0 :
+    assign mem_data_1 = R1_en ? ((mem_index_1 == 2'b00) ? (ex_addr_en ? 64'b0 : mem0_rd_data_0) :
                                  (mem_index_1 == 2'b01) ? mem0_rd_data_1 :
                                  (mem_index_1 == 2'b10) ? (upc_addr_en ? 64'b0 : mem1_rd_data_0) :
                                  mem1_rd_data_1) : 64'b0;
                         
-    assign mem_data_2 = R2_en ? ((mem_index_2 == 2'b00) ? mem0_rd_data_0 :
+    assign mem_data_2 = R2_en ? ((mem_index_2 == 2'b00) ? (ex_addr_en ? 64'b0 : mem0_rd_data_0) :
                                  (mem_index_2 == 2'b01) ? mem0_rd_data_1 :
                                  (mem_index_2 == 2'b10) ? (upc_addr_en ? 64'b0 : mem1_rd_data_0) :
                                  mem1_rd_data_1) : 64'b0;
     
-    // 优先级分配：upc_addr_en>R0>R3>R1>R2，考虑使能信号
+    // 优先级分配：ex_addr_en(仅mem0_0)>upc_addr_en(仅mem1_0)>R0>R3>R1>R2，考虑使能信号
     // 如果多个寄存器需要同一个存储器端口，优先级高的获得数据，优先级低的获得0
     // 如果寄存器使能无效，则直接输出0
     assign R0_in = R0_en ? mem_data_0 : 64'b0;
-    assign R1_in = R1_en ? (((R0_en && mem_index_1 == mem_index_0) || (R3_en != 2'b00 && mem_index_1 == mem_index_3)) ? 64'b0 : mem_data_1) : 64'b0;
-    assign R2_in = R2_en ? (((R0_en && mem_index_2 == mem_index_0) || (R3_en != 2'b00 && mem_index_2 == mem_index_3) || (R1_en && mem_index_2 == mem_index_1)) ? 64'b0 : mem_data_2) : 64'b0;
+    assign R1_in = R1_en ? (((ex_addr_en && mem_index_1 == 2'b00) || (R0_en && mem_index_1 == mem_index_0) || (R3_en != 2'b00 && mem_index_1 == mem_index_3)) ? 64'b0 : mem_data_1) : 64'b0;
+    assign R2_in = R2_en ? (((ex_addr_en && mem_index_2 == 2'b00) || (R0_en && mem_index_2 == mem_index_0) || (R3_en != 2'b00 && mem_index_2 == mem_index_3) || (R1_en && mem_index_2 == mem_index_1)) ? 64'b0 : mem_data_2) : 64'b0;
 
     // 存储器写使能信号生成，只有A口可以写（对应dual_ram的端口A）
     // mem0: A口可写，B口只读

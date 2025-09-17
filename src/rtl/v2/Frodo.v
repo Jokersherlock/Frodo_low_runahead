@@ -1,4 +1,4 @@
-`include "global_define.v"
+// `include "global_define.v"
 `timescale 1ns / 1ns
 module Frodo #(
     parameter TIME = 1000
@@ -33,12 +33,13 @@ module Frodo #(
     wire [2:0] R0_mask;
     wire R1_mask;
     wire [7:0] R3_mask;
-    wire [63:0] R3_data;
     wire [31:0] R1_32;
     wire [15:0] R0_16;
     wire [7:0] R0_8;
     wire [11:0] mem0_rd_addr_0, mem0_rd_addr_1, mem1_rd_addr_0, mem1_rd_addr_1;
     wire [11:0] upc_addr;
+    wire [11:0] ex_addr;
+    wire ex_addr_en;
     wire [63:0] mem_wr_data;
     wire upc_addr_en;
     wire [1:0] level_reg;
@@ -52,7 +53,11 @@ module Frodo #(
     wire macs_en;
     wire macs_mode;
     wire macs_signal;
-
+    wire [63:0] macs_result;
+    wire load_en;
+    wire consume_en;
+    wire [15:0] data_encode;
+    wire [15:0] data_decode;
     Control u_Control(
         .clk(clk),
         .rstn(rstn),
@@ -92,9 +97,10 @@ module Frodo #(
         .R0_8(R0_8),
         .R2_out(R2_out),
         //.R3_mask(R3_mask),
-        .R3_data(R3_data),
         .upc_addr(upc_addr),
         .upc_addr_en(upc_addr_en),
+        .ex_addr(ex_addr),
+        .ex_addr_en(ex_addr_en),
         .mem_wr_data(mem_wr_data),
         .R0_in(R0_in),
         .R1_in(R1_in),
@@ -106,7 +112,12 @@ module Frodo #(
         .mem_wen(mem_wen),
         .macs_en(macs_en),
         .macs_mode(macs_mode),
-        .macs_signal(macs_signal)
+        .macs_signal(macs_signal),
+        .macs_result(macs_result),
+        .load_en(load_en),
+        .consume_en(consume_en),
+        .data_encode(data_encode),
+        .data_decode(data_decode)
     );
 
 
@@ -181,7 +192,9 @@ module Frodo #(
         .mem1_wr_en_0(mem1_wr_en_0),
         .mem1_wr_en_1(mem1_wr_en_1),
         .upc_addr(upc_addr),
-        .upc_addr_en(upc_addr_en)
+        .upc_addr_en(upc_addr_en),
+        .ex_addr(ex_addr),
+        .ex_addr_en(ex_addr_en)
     );
     
     wire [7:0] mem_wen_mask;
@@ -269,26 +282,45 @@ module Frodo #(
     );
 
 
-    // Macs u_Macs(
-    //     .clk(clk),
-    //     .rstn(rstn),
-    //     .a_0(R1_32[7:0]),
-    //     .a_1(R1_32[15:8]),
-    //     .a_2(R1_32[23:16]),
-    //     .a_3(R1_32[31:24]),
-    //     .b_0(R0_16),
-    //     .b_1(R0_16),
-    //     .b_2(R0_16),
-    //     .b_3(R0_16),
-    //     .c_0(R2_out[15:0]),
-    //     .c_1(R2_out[31:16]),
-    //     .c_2(R2_out[47:32]),
-    //     .c_3(R2_out[63:48]),
-    //     .mode(mode_reg),
-    //     .signal(signal_reg),
-    //     .en(en_reg),
-    //     .result(result_reg),
-    //     .level(level_reg)
-    // );
+    Macs u_Macs(
+        .clk(clk),
+        .rstn(rstn),
+        .a_0(R1_32[7:0]),
+        .a_1(R1_32[15:8]),
+        .a_2(R1_32[23:16]),
+        .a_3(R1_32[31:24]),
+        .b_0(R0_16),
+        .b_1(R0_16),
+        .b_2(R0_16),
+        .b_3(R0_16),
+        .c_0(R2_out[15:0]),
+        .c_1(R2_out[31:16]),
+        .c_2(R2_out[47:32]),
+        .c_3(R2_out[63:48]),
+        .mode(mode_reg),
+        .signal(macs_signal),
+        .en(macs_en),
+        .result(macs_result),
+        .level(level_reg)
+    );
+
+    Encode u_Encode(
+        .clk(clk),
+        .rstn(rstn),
+        .load_en(load_en),
+        .consume_en(consume_en),
+        .data_in(R0_16),
+        .dout16(data_encode)
+    );
+
+
+    Decode u_Decode(
+        .clk(clk),
+        .rstn(rstn),
+        .load_en(load_en),
+        .consume_en(consume_en),
+        .data_in(R0_16),
+        .dout16(data_decode)
+    );
 
 endmodule

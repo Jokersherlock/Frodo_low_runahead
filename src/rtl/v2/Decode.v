@@ -6,7 +6,7 @@ module Decode (
     input              consume_en,    // 模式二：消费并输出 16bit 数据
     input              clr,    
     input       [1:0]  level,          // 11→640(2bit)，10→976(3bit)，01→1344(4bit)
-    input       [15:0] din16,       // 从 RAM 读回的 16bit
+    input       [15:0] data_in,       // 从 RAM 读回的 16bit
     output reg  [15:0] dout16         // 并行输出 16bit
 );
     
@@ -66,7 +66,7 @@ module Decode (
     wire [15:0] d0;
     wire [0:15] q0;
 
-    assign d0 = din16[15: 0];
+    assign d0 = data_in[15: 0];
 
     assign q0 = decode16(d0, level);
 

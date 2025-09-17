@@ -15,6 +15,9 @@ class MicrocodeAssembler:
             'DOUT_EN'   : {'bits':1,'offset':22},    # hash输出使能
             'STALL'     : {'bits':1,'offset':23},    # 等待hash运算
             'MEM_WEN'   : {'bits':1,'offset':24},    # 写mem使能
+            'A_INDEX'   : {'bits':2,'offset':25},    # A矩阵索引
+            'LOAD_EN'   : {'bits':1,'offset':27},    # 加载使能
+            'CONSUME_EN': {'bits':1,'offset':28},    # 消耗使能
         }
         self.validate_field_structure()
 

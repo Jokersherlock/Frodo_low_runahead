@@ -19,7 +19,6 @@ S_ref = np.loadtxt('py/uinstv2/data/S_matrix_640.txt', dtype=np.int32)
 S_equal = (S == S_ref)
 print("S == S_ref:")
 print(S_equal)
-
 # 获取不相同的个数
 # S_different_count = np.sum(~S_equal)
 # print(f"S中不相同的元素个数: {S_different_count}")
@@ -29,7 +28,7 @@ print(S_equal)
 # print()
 
 
-E = reader_0.read_matrix(16,640,8,16)
+E = reader_1.read_matrix(16,640,8,16)
 E = np.array(E)
 # #E = E.T
 E_ref = np.loadtxt('py/uinstv2/data/E_matrix_640.txt', dtype=np.int32)
@@ -39,9 +38,9 @@ E_equal = (E == E_ref)
 print("E == E_ref:")
 print(E_equal)
 
-# 获取不相同的个数
-E_different_count = np.sum(~E_equal)
-print(f"E中不相同的元素个数: {E_different_count}")
-print(f"E中总元素个数: {E.size}")
-print(f"E中相同的元素个数: {E.size - E_different_count}")
-print(f"E的匹配率: {(E.size - E_different_count) / E.size * 100:.2f}%")
+# # 获取不相同的个数
+# E_different_count = np.sum(~E_equal)
+# print(f"E中不相同的元素个数: {E_different_count}")
+# print(f"E中总元素个数: {E.size}")
+# print(f"E中相同的元素个数: {E.size - E_different_count}")
+# print(f"E的匹配率: {(E.size - E_different_count) / E.size * 100:.2f}%")
