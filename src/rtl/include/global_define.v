@@ -29,7 +29,7 @@
 // 仿真/综合模式切换宏定义
 // 注释掉下面这行使用仿真模式（dual_ram, rom模块）
 // 取消注释使用综合模式（IP核）
-`define USE_IP_CORE
+// `define USE_IP_CORE
 
 
 `endif

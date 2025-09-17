@@ -28,7 +28,6 @@ module Control(
     output                                  flag15to8,//640等级下,hash位宽转换
     
     // Bus模块相关输出端口
-    output     [16:0]                       addr_0, addr_1, addr_2, addr_3,
     output                                  R0_en, R1_en, R2_en,
     output     [1:0]                        R3_en,
     input     [2:0]                        R0_mask,
@@ -43,6 +42,14 @@ module Control(
     output     [11:0]                       ex_addr,
     output                                  ex_addr_en,
     input      [63:0]                       R0_in,R1_in,R2_in,
+    
+    // AGU相关输出端口
+    output     [16:0]                       addr_start_0, addr_start_1, addr_start_2, addr_start_3,
+    output     [1:0]                        R0_mode,
+    output     [2:0]                        R3_mode,
+    output                                  R1_mode, R2_mode,
+    output     [3:0]                        addr_clr, addr_add,
+    output     [2:0]                        addr_carry,
 
     input                                  keccak_ready,
     output                                 sample_en,
@@ -278,11 +285,6 @@ module Control(
     wire [`UINST_ADDR_WIDTH-1:0] upc_start;
     wire flag15to8;
     wire [2:0] lut_flag;
-    wire [16:0] addr_start_0,addr_start_1,addr_start_2,addr_start_3;
-    wire [1:0] R0_mode;
-    wire [2:0] R3_mode;
-    wire R1_mode;
-    wire R2_mode;
 //    wire [2:0] R0_mask;
 //    wire R1_mask;
     wire R0_inverse;
@@ -292,7 +294,6 @@ module Control(
     wire hash_in_src;
     wire hash_ex_mode;
 //    wire R0_en,R1_en,R2_en;
-    wire [1:0] R3_en;
     wire ram_reset_inst;
 //    wire [63:0] R0_in,R1_in,R2_in,R3_in;
 
@@ -306,12 +307,9 @@ module Control(
     // wire [7:0] R0_8;
     wire [`UINST_WIDTH-1:0] uinst;
 
-    wire [16:0] addr_0,addr_1,addr_2,addr_3;
     wire [2:0] R3_src;
 
 
-    wire [11:0] upc_addr;
-    wire upc_addr_en;
 
 
     wire done;
@@ -322,9 +320,6 @@ module Control(
     assign upc_st = uinst[3:1];
     assign upc_up = uinst[6:4];
     
-    wire [3:0] addr_clr;
-    wire [3:0] addr_add;
-    wire [2:0] addr_carry;
     assign addr_clr = uinst[10:7];
     assign addr_add = uinst[14:11];
     assign addr_carry = uinst[17:15];
@@ -516,26 +511,6 @@ module Control(
         .R0_8(R0_8)
     );
 
-    AGU u_AGU(
-        .clk(clk),
-        .rstn(rstn),
-        .level(level_reg),
-        .addr_start_0(addr_start_0),
-        .addr_start_1(addr_start_1),
-        .addr_start_2(addr_start_2),
-        .addr_start_3(addr_start_3),
-        .R0_mode(R0_mode),
-        .R3_mode(R3_mode),
-        .R1_mode(R1_mode),
-        .R2_mode(R2_mode),
-        .addr_clr(addr_clr),
-        .addr_add(addr_add),
-        .addr_carry(addr_carry),
-        .addr_0(addr_0),
-        .addr_1(addr_1),
-        .addr_2(addr_2),
-        .addr_3(addr_3)
-    );
 
     wire [`UINST_WIDTH-1:0] uinst_temp;
 

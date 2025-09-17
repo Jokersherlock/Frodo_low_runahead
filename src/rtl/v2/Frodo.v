@@ -45,6 +45,14 @@ module Frodo #(
     wire [1:0] level_reg;
     wire [1:0] mode_reg;
     wire [63:0] R2_out;
+    
+    // AGU相关信号
+    wire [16:0] addr_start_0, addr_start_1, addr_start_2, addr_start_3;
+    wire [1:0] R0_mode;
+    wire [2:0] R3_mode;
+    wire R1_mode, R2_mode;
+    wire [3:0] addr_clr, addr_add;
+    wire [2:0] addr_carry;
 
     wire keccak_ready;
     wire sample_en;
@@ -82,10 +90,6 @@ module Frodo #(
         .hash_dout_en(hash_dout_en),
         .flag15to8(flag15to8),
         // Bus模块相关输出
-        .addr_0(addr_0),
-        .addr_1(addr_1),
-        .addr_2(addr_2),
-        .addr_3(addr_3),
         .R0_en(R0_en),
         .R1_en(R1_en),
         .R2_en(R2_en),
@@ -117,7 +121,41 @@ module Frodo #(
         .load_en(load_en),
         .consume_en(consume_en),
         .data_encode(data_encode),
-        .data_decode(data_decode)
+        .data_decode(data_decode),
+        // AGU相关输出
+        .addr_start_0(addr_start_0),
+        .addr_start_1(addr_start_1),
+        .addr_start_2(addr_start_2),
+        .addr_start_3(addr_start_3),
+        .R0_mode(R0_mode),
+        .R3_mode(R3_mode),
+        .R1_mode(R1_mode),
+        .R2_mode(R2_mode),
+        .addr_clr(addr_clr),
+        .addr_add(addr_add),
+        .addr_carry(addr_carry)
+    );
+
+    // AGU模块实例化
+    AGU u_AGU(
+        .clk(clk),
+        .rstn(rstn),
+        .level(level_reg),
+        .addr_start_0(addr_start_0),
+        .addr_start_1(addr_start_1),
+        .addr_start_2(addr_start_2),
+        .addr_start_3(addr_start_3),
+        .R0_mode(R0_mode),
+        .R3_mode(R3_mode),
+        .R1_mode(R1_mode),
+        .R2_mode(R2_mode),
+        .addr_clr(addr_clr),
+        .addr_add(addr_add),
+        .addr_carry(addr_carry),
+        .addr_0(addr_0),
+        .addr_1(addr_1),
+        .addr_2(addr_2),
+        .addr_3(addr_3)
     );
 
 
