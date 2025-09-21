@@ -471,7 +471,7 @@ class FrodoKEM(object):
         
         seedA = self.shake(z, self.len_seedA_bytes)
 
-        #print("seedA",seedA.hex().upper())
+        print("seedA",seedA.hex().upper())
 
         self.__print_intermediate_value("seedA", seedA)
         # 3. A = Frodo.Gen(seedA)

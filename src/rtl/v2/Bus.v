@@ -132,11 +132,11 @@ module Bus(
 
     // 存储器写使能信号生成，只有A口可以写（对应dual_ram的端口A）
     // mem0: A口可写，B口只读
-    assign mem0_wr_en_0 = (R3_en != 2'b00 && mem_index_3 == 2'b00) ? 1'b1 : 1'b0;
+    assign mem0_wr_en_0 = (mem_index_3 == 2'b00) ? 1'b1 : 1'b0;
     assign mem0_wr_en_1 = 1'b0;  // mem0的B口只读，不能写
     
     // mem1: A口可写，B口只读  
-    assign mem1_wr_en_0 = (R3_en != 2'b00 && mem_index_3 == 2'b10) ? 1'b1 : 1'b0;
+    assign mem1_wr_en_0 = (mem_index_3 == 2'b10) ? 1'b1 : 1'b0;
     assign mem1_wr_en_1 = 1'b0;  // mem1的B口只读，不能写
 
 endmodule

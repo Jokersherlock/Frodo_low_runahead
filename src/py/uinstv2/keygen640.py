@@ -13,6 +13,9 @@ instructions = [
     {'instruction_type': 'HASH_RND',     'fields': {'length': 0 , 'mode': 1}},                                 #执行一次挤压
     {'instruction_type': 'SQUEEZE_STRM','fields': {'addr':17, 'loop': 60, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #输出E主体60*1344/16=5040
     {'instruction_type': 'SQUEEZE',      'fields': {'addr': 1277, 'length': 19, 'ram_index': 1, 'mode': 0b10,'sample': 1}},  #输出E剩余,8*640-64-5040=1216,1216/64=19
+    {'instruction_type': 'ABSORB',       'fields': {'addr': 0xfc9, 'length': 2, 'ram_index': 0,'ram_reset': 1}},             #吸收z,128bit
+    {'instruction_type': 'HASH_RND',     'fields': {'length': 16 , 'mode': 0}},                                 #执行吸收,长度为16*8bit
+    {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfc9, 'length':2, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #输出seedA,16bit
 ]
 
 codes = assembler.assemble_batch_instructions(instructions)

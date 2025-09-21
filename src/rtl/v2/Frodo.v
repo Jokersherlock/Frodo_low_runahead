@@ -235,15 +235,17 @@ module Frodo #(
         .ex_addr_en(ex_addr_en)
     );
     
-    wire [7:0] mem_wen_mask;
-    assign mem_wen_mask = {8{mem_wen}};
+    wire [7:0] mem0_wen_mask,mem1_wen_mask,mem_uinst_mask;
+    assign mem0_wen_mask = {8{mem0_wr_en_0}};
+    assign mem1_wen_mask = {8{mem1_wr_en_0}};
+    assign mem_uinst_mask = {8{mem_wen}};
 
 `ifdef USE_IP_CORE
     // 使用IP核模式
     mem0 u_mem0(
         .clka(clk),
         .ena(1'b1),
-        .wea(R3_mask&mem0_wen_mask),
+        .wea(R3_mask&mem0_wen_mask&mem_uinst_mask),
         .addra(mem0_rd_addr_0),
         .dina(mem_wr_data),
         .douta(mem0_rd_data_0),
@@ -257,7 +259,7 @@ module Frodo #(
     mem1 u_mem1(
         .clka(clk),
         .ena(1'b1),
-        .wea(R3_mask&mem1_wen_mask),
+        .wea(R3_mask&mem1_wen_mask&mem_uinst_mask),
         .addra(mem1_rd_addr_0),
         .dina(mem_wr_data),
         .douta(mem1_rd_data_0),
@@ -281,7 +283,7 @@ module Frodo #(
         .rstn(rstn),
         .addr_a(mem0_rd_addr_0),
         .din_a(mem_wr_data),
-        .wr_mask_a(R3_mask & mem_wen_mask),
+        .wr_mask_a(R3_mask & mem0_wen_mask&mem_uinst_mask),
         .dout_a(mem0_rd_data_0),
         .addr_b(mem0_rd_addr_1),
         .din_b(64'b0),
@@ -301,7 +303,7 @@ module Frodo #(
         .rstn(rstn),
         .addr_a(mem1_rd_addr_0),
         .din_a(mem_wr_data),
-        .wr_mask_a(R3_mask & mem_wen_mask),
+        .wr_mask_a(R3_mask & mem1_wen_mask&mem_uinst_mask),
         .dout_a(mem1_rd_data_0),
         .addr_b(mem1_rd_addr_1),
         .din_b(64'b0),
