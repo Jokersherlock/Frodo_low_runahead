@@ -22,6 +22,7 @@ z_640 = '92F267AAFA3F87CA60D01CB54F29202A'
 seedSE_640 = '2FD81A25CCB148032DCD739936737F2DB505D7CFAD1B497499323C8686325E47'
 
 mem0.store_hex_string_little_endian(seedSE_640,0xfc1)
+mem0.store_hex_string_little_endian(z_640,0xfc9)
 
 
 

@@ -467,7 +467,7 @@ class FrodoKEM(object):
         print("seedSE",seedSE.hex().upper())
         z = bytes(s_seedSE_z[self.len_s_bytes + self.len_seedSE_bytes : self.len_s_bytes + self.len_seedSE_bytes + self.len_z_bytes])
         # 2. Generate pseudorandom seed seedA = SHAKE(z, len_seedA) (length in bits)
-        #print("z",z.hex().upper())
+        print("z",z.hex().upper())
         
         seedA = self.shake(z, self.len_seedA_bytes)
 
@@ -493,7 +493,7 @@ class FrodoKEM(object):
         #print(Stransposed)
         self.__print_intermediate_value("S^T", Stransposed)
         S = self.__matrix_transpose(Stransposed)
-        print(S)
+        #print(S)
         # 6. E = Frodo.SampleMatrix(r[n*nbar .. 2*n*nbar-1], n, nbar)
         E = self.sample_matrix(r[self.n * self.nbar : 2 * self.n * self.nbar], self.n, self.nbar)
         # self.__print_intermediate_value("E", E)

@@ -200,7 +200,7 @@ module InstDecoder (
                     loop_2 <= 8'b0;
                     loop_3 <= 8'b0;
                 end
-                `SQUEEZE_L:begin
+                `SQUEEZE_STRM:begin
                     loop_0 <= {inst_reg[`INST_WIDTH-27:`INST_WIDTH-28],inst_reg[`INST_WIDTH-13:`INST_WIDTH-18]};
                     loop_1 <= level == `FRODO_640 ? 8'd84 : 8'd68;
                     loop_2 <= 8'b0;
@@ -224,7 +224,7 @@ module InstDecoder (
                               level == `FRODO_976 ?  8'd52 :
                               level == `FRODO_1344 ? 8'd84 : 8'b0;
                 end
-                `TRANS:begin
+                `ENCDEC:begin
                     if(inst_reg[`INST_WIDTH-22])begin//decode
                         loop_0 <= 12'd4;
                         loop_1 <= 8'd16;
@@ -266,7 +266,7 @@ module InstDecoder (
         end
         else if(state_reg == ID)begin
             case (opcode)
-                `ABSORB_B:begin
+                `ABSORB_BYTE:begin
                     hash_in_src <= 1'b1;
                 end
                 `ABSORB:begin
@@ -300,7 +300,7 @@ module InstDecoder (
                 `AMATMUL:begin
                     hash_lev <= 1'b0;
                 end
-                `HASH_EX:begin
+                `HASH_RND:begin
                     hash_lev <= inst_reg[`INST_WIDTH-20];
                 end
                 default:begin
@@ -319,10 +319,10 @@ module InstDecoder (
         end
         else if(state_reg == ID)begin
             case (opcode)
-                `HASH_EX:begin
+                `HASH_RND:begin
                     hash_ex_mode <= inst_reg[`INST_WIDTH-22];
                 end
-                `SQUEEZE_L:begin
+                `SQUEEZE_STRM:begin
                     hash_ex_mode <= 1'b1;
                 end
                 `AMATMUL:begin
@@ -344,7 +344,7 @@ module InstDecoder (
         end
         else if(state_reg == ID)begin
             case (opcode)
-                `HASH_EX:begin
+                `HASH_RND:begin
                     di_len <= {inst_reg[`INST_WIDTH-9:`INST_WIDTH-18],3'b0};//length*8
                     //di_len <= 8;
                 end
@@ -428,7 +428,7 @@ module InstDecoder (
         end
         else if(state_reg == ID)begin
             case (opcode)
-                `SQUEEZE_L:begin
+                `SQUEEZE_STRM:begin
                     sample_en <= inst_reg[`INST_WIDTH-22];
                 end
                 `SQUEEZE:begin
@@ -464,7 +464,7 @@ module InstDecoder (
                 `AMATMUL:begin
                     R0_mode <= NORMAL8;
                 end
-                `TRANS:begin
+                `ENCDEC:begin
                     R0_mode <= NORMAL16;
                 end
                 default:begin
@@ -493,7 +493,7 @@ module InstDecoder (
         end
         else if(state_reg == ID)begin
             case (opcode)
-                `SQUEEZE_L:begin
+                `SQUEEZE_STRM:begin
                     case(inst_reg[`INST_WIDTH-20:`INST_WIDTH-21])
                         2'b00:begin //S，生成S,S'
                             R3_mode <= GENS;
@@ -528,7 +528,7 @@ module InstDecoder (
                 `AMATMUL:begin
                     R3_mode <= inst_reg[`INST_WIDTH-22] ? WRITE64 : AMATMUL;
                 end
-                `TRANS:begin
+                `ENCDEC:begin
                     R3_mode <= WRITE16;
                 end
                 default:begin
@@ -589,7 +589,7 @@ module InstDecoder (
                 `ABSORB:begin
                     addr_start_0 <= {inst_reg[`INST_WIDTH-19],1'b0,inst_reg[`INST_WIDTH-1:`INST_WIDTH-12],3'b0};
                 end
-                `SQUEEZE_L:begin
+                `SQUEEZE_STRM:begin
                     addr_start_3 <= {inst_reg[`INST_WIDTH-19],1'b0,inst_reg[`INST_WIDTH-1:`INST_WIDTH-12],3'b0};
                 end
                 `SQUEEZE:begin
@@ -609,7 +609,7 @@ module InstDecoder (
                         end
                     endcase
                 end
-                `TRANS:begin
+                `ENCDEC:begin
                     case(ID_cnt)
                         3'b011:begin
                             addr_start_0 <= {mem0_rd_data_0[13:0],3'b0};
@@ -652,7 +652,7 @@ module InstDecoder (
                     R2_en <= 1'b0;
                     R3_en <= 2'b00;
                 end
-                `SQUEEZE_L:begin
+                `SQUEEZE_STRM:begin
                     R0_en <= 1'b0;
                     R1_en <= 1'b0;
                     R2_en <= 1'b0;
@@ -693,7 +693,7 @@ module InstDecoder (
                     R2_en <= 1'b1;
                     R3_en <= 2'b11;
                 end
-                `TRANS:begin
+                `ENCDEC:begin
                     R0_en <= 1'b1;
                     R1_en <= 1'b0;
                     R2_en <= 1'b0;
@@ -728,7 +728,7 @@ module InstDecoder (
         end
         else if(state_reg == ID)begin
             case (opcode)
-                `SQUEEZE_L:begin
+                `SQUEEZE_STRM:begin
                     R3_src <= inst_reg[`INST_WIDTH-22] ? SAMPLE : HASH;
                 end
                 `SQUEEZE:begin
@@ -737,7 +737,7 @@ module InstDecoder (
                 `AMATMUL:begin
                     R3_src <= MACS;
                 end
-                `TRANS:begin
+                `ENCDEC:begin
                     R3_src <= inst_reg[`INST_WIDTH-22] ? DECODE : ENCODE;
                 end
                 default:begin
