@@ -3,17 +3,17 @@ import numpy as np
 from hash2mat import hex_string_to_matrix
 
 
-reader_0 = MemoryReader('sim/hex/mem0_output.hex','hex')
+reader_0 = MemoryReader('src/sim/hex/mem0_output.hex','hex')
 #print(S)
 #S = S.T
-reader_1 = MemoryReader('sim/hex/mem1_output.hex','hex')
+reader_1 = MemoryReader('src/sim/hex/mem1_output.hex','hex')
 #reader_1 = MemoryReader('sim/RAM/final/mem1_decap.hex','hex')
 # reader_0 = MemoryReader('sim/RAM/final/mem0_Bprime.hex','hex')
 
 S = reader_0.read_matrix(0xA81,640,8,8)
 S = np.array(S)
 #S = S.T
-S_ref = np.loadtxt('data/S_matrix_640.txt', dtype=np.int32)
+S_ref = np.loadtxt('src/py/uinstv2/data/S_matrix_640.txt', dtype=np.int32)
 
 # 比较S和S_ref
 S_equal = (S == S_ref)
@@ -31,7 +31,7 @@ print(S_equal)
 E = reader_1.read_matrix(16,640,8,16)
 E = np.array(E)
 # #E = E.T
-E_ref = np.loadtxt('data/E_matrix_640.txt', dtype=np.int32)
+E_ref = np.loadtxt('src/py/uinstv2/data/E_matrix_640.txt', dtype=np.int32)
 
 # 比较E和E_ref
 E_equal = (E == E_ref)

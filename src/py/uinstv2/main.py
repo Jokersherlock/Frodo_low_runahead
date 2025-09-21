@@ -48,7 +48,7 @@ keygen_sequence = [
 ]
 
 binary_codes, instruction_addresses = uinst_assembler.assemble_sequence(keygen_sequence)
-uinst_assembler.save_to_bin(binary_codes)
+uinst_assembler.save_to_bin(binary_codes,"test_uinst.bin")
 
 print("指令首地址信息:")
 for instruction_name, address in instruction_addresses.items():

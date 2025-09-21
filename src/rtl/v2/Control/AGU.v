@@ -10,9 +10,6 @@ module AGU (
     input           R2_mode,
     input  [3:0]    addr_clr,
     input  [3:0]    addr_add,
-    // input           addr1_carry,//addr1是否进位
-    // input           addr2_carry,//addr2是否进位
-    // input           addr3_carry,//addr3是否进位
     output reg  [16:0]  addr_0,addr_1,addr_2,addr_3
 );
 

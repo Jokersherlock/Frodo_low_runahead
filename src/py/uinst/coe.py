@@ -58,9 +58,9 @@ def bin2coe(path, radix=2):
     print(f"生成 COE 文件: {coe_path} (bit width: {bit_width}, radix: {radix})")
 
 if __name__ == '__main__':
-    path = '../../src/coe/inst_coe/inst_v2.bin'
+    path = 'rtl/coe/inst_coe/inst_v2.bin'
     bin2coe(path, 2)
-    path = '../../src/coe/inst_coe/inst_ke.bin'
+    path = 'rtl/coe/inst_coe/inst_ke.bin'
     bin2coe(path, 2)
-    path = '../../src/coe/ram_coe/mem0.hex'
+    path = 'rtl/coe/ram_coe/mem0.hex'
     bin2coe(path, 16)

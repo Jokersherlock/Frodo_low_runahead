@@ -131,7 +131,7 @@ module Frodo #(
         .R1_mode(R1_mode),
         .R2_mode(R2_mode),
         .addr_clr(addr_clr),
-        .addr_add(addr_add),
+        .addr_add(addr_add)
     );
 
     // AGU模块实例化

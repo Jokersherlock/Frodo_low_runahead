@@ -323,26 +323,26 @@ module Control(
     assign addr_add = uinst[14:11];
     
     wire macs_en;
-    assign macs_en = uinst[15];
+    assign macs_en = uinst[18];
     
     wire ex_en;
-    assign di_valid = uinst[16];
-    assign ex_en = uinst[17];
-    assign ram_reset = uinst[18] | ram_reset_inst;
-    assign hash_dout_en = uinst[19];
+    assign di_valid = uinst[19];
+    assign ex_en = uinst[20];
+    assign ram_reset = uinst[21] | ram_reset_inst;
+    assign hash_dout_en = uinst[22];
     
     wire stall;
-    assign stall = uinst[20];
+    assign stall = uinst[23];
 
     wire mem_wen;
-    assign mem_wen = uinst[21];
+    assign mem_wen = uinst[24];
 
     wire [1:0] a_index;
-    assign a_index = uinst[23:22];
+    assign a_index = uinst[26:25];
     //wire load_en;
-    assign load_en = uinst[24];
+    assign load_en = uinst[27];
    // wire consume_en;
-    assign consume_en = uinst[25];
+    assign consume_en = uinst[28];
 
     reg [15:0] A_line_index;
 
