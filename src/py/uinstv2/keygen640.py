@@ -7,7 +7,7 @@ instructions = [
     {'instruction_type': 'ABSORB_BYTE',  'fields': {'byte': 0x5f}},                                             #吸收5f                       
     {'instruction_type': 'ABSORB',       'fields': {'addr': 0xfc1, 'length': 4, 'ram_index': 0x00}},            #吸收seedse,256bit
     {'instruction_type': 'HASH_RND',     'fields': {'length': 33 , 'mode': 0}},                                 #执行吸收,长度为33*8bit
-    {'instruction_type': 'SQUEEZE_STRM', 'fields': {'addr': 0xa81, 'loop': 0x60, 'mode': 0b00,'sample': 1}},    #输出S的主体,60*1344/16=5040
+    {'instruction_type': 'SQUEEZE_STRM', 'fields': {'addr': 0xa81, 'loop': 60, 'mode': 0b00,'sample': 1}},    #输出S的主体,60*1344/16=5040
     {'instruction_type': 'SQUEEZE',      'fields': {'addr': 3249, 'length': 20, 'ram_index': 0, 'mode': 0b00,'sample': 1}}, #输出S剩余,8*640-5040=1280,1280/64=20
     {'instruction_type': 'SQUEEZE',      'fields': {'addr': 0x10, 'length': 1, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #输出首轮E,1344-1280=64,64/64=1
     {'instruction_type': 'HASH_RND',     'fields': {'length': 0 , 'mode': 1}},                                 #执行一次挤压
