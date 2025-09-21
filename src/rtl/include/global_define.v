@@ -23,6 +23,7 @@
 `define ABSORB        4'b1000
 `define SQUEEZE       4'b1001
 `define HASH_RND      4'b1010
+`define ABSORB_STRM   4'b1011
 `define SQUEEZE_STRM  4'b1100
 `define ABSORB_BYTE   4'b1101
 
