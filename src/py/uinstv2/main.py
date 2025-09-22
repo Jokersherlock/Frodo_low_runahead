@@ -11,12 +11,6 @@ from core.instruction_merger import InstructionMerger
 from algorithms.keygen640 import Keygen640Generator
 from instructions.uinst_assembler import UinstAssembler
 
-np.random.seed(1234)
-A = np.random.randint(1,9,size=(8,1344))
-B = np.random.randint(1,9,size=(8,1344))
-C = np.random.randint(1,9,size=(8,1344))
-
-# print(A)
 
 mem0 = Memory()
 mem1 = Memory()
@@ -94,5 +88,5 @@ print(f"算法位置信息: {merger.get_algorithm_positions()}")
 # 确保输出目录存在
 os.makedirs("../../sim/hex", exist_ok=True)
 
-mem0.export_to_file("../../sim/hex/mem0.hex","hex")
-mem1.export_to_file("../../sim/hex/mem1.hex","hex")
+mem0.export_to_file("./src/sim/hex/mem0.hex","hex")
+mem1.export_to_file("./src/sim/hex/mem1.hex","hex")

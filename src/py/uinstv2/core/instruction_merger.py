@@ -17,7 +17,7 @@ class InstructionMerger:
     格式：首行全0 + 算法1序列 + 算法2序列 + ...
     """
     
-    def __init__(self, output_dir: str = "../../sim/bin"):
+    def __init__(self, output_dir: str = "./src/sim/bin"):
         """
         初始化指令合并器
         
@@ -157,7 +157,7 @@ class InstructionMerger:
 
 def merge_algorithms(algorithms: List[FrodoAlgorithmBase], 
                     algorithm_names: List[str] = None,
-                    output_dir: str = "../../sim/bin",
+                    output_dir: str = "./src/sim/bin",
                     filename: str = "inst.bin") -> Tuple[str, Dict[str, Any]]:
     """
     便捷函数：合并多个算法到单个文件
