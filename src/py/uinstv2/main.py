@@ -32,23 +32,16 @@ print("正在生成uinst.bin文件...")
 uinst_assembler = UinstAssembler()
 
 # 定义密钥生成序列（与算法无关的通用指令序列）
-keygen_sequence = [
+sequence = [
     'ABSORB_BYTE', # 吸收字节操作
+    'HASH_RND',    # 哈希随机数生成
     'ABSORB',      # 吸收操作
-    'HASH_RND',    # 哈希随机数生成
     'SQUEEZE_STRM', # 挤压流操作
-    'SQUEEZE',     # 挤压操作
-    'SQUEEZE',     # 挤压操作
-    'HASH_RND',    # 哈希随机数生成
-    'SQUEEZE_STRM', # 挤压流操作
-    'SQUEEZE',     # 挤压操作
-    'ABSORB',      # 吸收操作
-    'HASH_RND',    # 哈希随机数生成
     'SQUEEZE',     # 挤压操作
 ]
 
-binary_codes, instruction_addresses = uinst_assembler.assemble_sequence(keygen_sequence)
-uinst_assembler.save_to_bin(binary_codes,"test_uinst.bin")
+binary_codes, instruction_addresses = uinst_assembler.assemble_sequence(sequence)
+uinst_assembler.save_to_bin(binary_codes,"uinst.bin")
 
 print("指令首地址信息:")
 for instruction_name, address in instruction_addresses.items():

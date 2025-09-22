@@ -189,7 +189,7 @@ module Frodo #(
         .ADDR_WIDTH(8),
         .DATA_WIDTH(28),
         .MEM_DEPTH(256),
-        .HEX_FILE("../../../../../../src/sim/bin/keygen640.bin")
+        .HEX_FILE("../../../../../../src/sim/bin/inst.bin")
     ) u_inst_rom(
         .clk(clk),
         .addr(pc),

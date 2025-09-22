@@ -85,7 +85,7 @@ class UinstAssembler:
             filename: 输出文件名
         """
         # 确保输出目录存在
-        output_dir = os.path.join(os.path.dirname(__file__), "..", "..", "sim", "bin")
+        output_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..","sim", "bin")
         os.makedirs(output_dir, exist_ok=True)
         
         output_path = os.path.join(output_dir, filename)
