@@ -13,7 +13,7 @@ reader_1 = MemoryReader('sim/hex/mem1_output.hex','hex')
 S = reader_0.read_matrix(0xA81,640,8,8)
 S = np.array(S)
 #S = S.T
-S_ref = np.loadtxt('py/uinstv2/data/S_matrix_640.txt', dtype=np.int32)
+S_ref = np.loadtxt('data/S_matrix_640.txt', dtype=np.int32)
 
 # 比较S和S_ref
 S_equal = (S == S_ref)
@@ -31,7 +31,7 @@ print(S_equal)
 E = reader_1.read_matrix(16,640,8,16)
 E = np.array(E)
 # #E = E.T
-E_ref = np.loadtxt('py/uinstv2/data/E_matrix_640.txt', dtype=np.int32)
+E_ref = np.loadtxt('data/E_matrix_640.txt', dtype=np.int32)
 
 # 比较E和E_ref
 E_equal = (E == E_ref)

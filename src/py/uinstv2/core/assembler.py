@@ -716,7 +716,7 @@ def main():
     # #     ]
         
     #     # 写入测试文件
-    test_file = 'D:/zzp/project/Frodo_low_overhead/src/sim/bin/inst.bin'
+    test_file = '../../sim/bin/inst.bin'
     #assembler.write_bin_file(test_instructions, test_file)
     print(f"已创建测试文件: {test_file}")
     

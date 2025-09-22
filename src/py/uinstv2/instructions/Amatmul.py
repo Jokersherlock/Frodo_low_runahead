@@ -1,0 +1,39 @@
+from .mininst import MicrocodeAssembler
+
+def get_amatmul_instructions():
+    """获取A矩阵乘法微指令"""
+    return [
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b1111,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 0,'EX_EN' : 0,'RAM_RESET' : 1,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#地址清0，hash复位
+    {'DONE':0,'UPC_ST' : 0b100,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 0,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#loop0,循环数为n
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0001,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b10,'LOAD_EN':0,'CONSUME_EN':0},#hash输入A行号低位,seedA地址这个周期开始加
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0001,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b11,'LOAD_EN':0,'CONSUME_EN':0},#hash输入A行号高位
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0001,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#hash输入seedA
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0001,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#hash输入seedA
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0001,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#hash输入seedA
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0001,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#hash输入seedA
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0001,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#hash输入seedA
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0001,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#hash输入seedA,地址增加结束
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#hash输入seedA
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 1,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#hash输入seedA
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 0,'EX_EN' : 1,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 1,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#执行吸收,
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 0,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#空周期
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 0,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#空周期
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 0,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#空周期
+
+    {'DONE':0,'UPC_ST' : 0b101,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 0,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#loop1,循环数为n/84-1
+    {'DONE':0,'UPC_ST' : 0b110,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 0,'DI_VALID' : 0,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},#loop2,循环数为84
+    {'DONE':0,'UPC_ST' : 0b000,'UPC_UP' : 0b000,'ADDR_CLR' : 0b0000,'ADDR_ADD' : 0b0000,'MACS_EN' : 1,'DI_VALID' : 0,'EX_EN' : 0,'RAM_RESET' : 0,'DOUT_EN' : 0,'STALL' : 0,'MEM_WEN':0,'A_INDEX':0b00,'LOAD_EN':0,'CONSUME_EN':0},
+    ]
+
+def main():
+    """主函数，用于单独测试"""
+    assembler = MicrocodeAssembler()
+    multi_inst = get_amatmul_instructions()
+    binary_codes = assembler.assemble_batch(multi_inst)
+    
+    for i, code in enumerate(binary_codes):
+        #print(f"指令{i+1}: {code} 长度={len(code)}bits")
+        print(code)
+
+if __name__ == "__main__":
+    main()

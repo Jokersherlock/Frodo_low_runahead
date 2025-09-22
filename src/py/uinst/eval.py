@@ -13,20 +13,20 @@ reader_1 = MemoryReader('sim/mem1_result.hex','hex')
 S = reader_1.read_matrix(2704,640,8,8)
 S = np.array(S)
 #S = S.T
-S_ref = np.loadtxt('psrc/data/S_matrix_640.txt', dtype=np.int32)
+S_ref = np.loadtxt('../../data/S_matrix_640.txt', dtype=np.int32)
 print(S==S_ref)
 
 
 E = reader_0.read_matrix(16,640,8,16)
 E = np.array(E)
 #E = E.T
-E_ref = np.loadtxt('psrc/data/E_matrix_640.txt', dtype=np.int32)
+E_ref = np.loadtxt('../../data/E_matrix_640.txt', dtype=np.int32)
 print(E==E_ref)
 
 B = reader_1.read_matrix(16,976,8,16,signed=False)
 B = np.array(B)
 B = B.T
-B_ref = np.loadtxt('psrc/data/Bprime_matrix_976.txt', dtype=np.int32)
+B_ref = np.loadtxt('../../data/Bprime_matrix_976.txt', dtype=np.int32)
 #B_ref = np.loadtxt('psrc/data/B_matrix_976.txt', dtype=np.int32)
 # #np.savetxt('B.txt',B,fmt='%d')
 #print(B==B_ref)
@@ -36,8 +36,8 @@ E__ = np.array(E__)
 V_T = reader_1.read_matrix(4072,8,8,16,signed=False)
 V_T = np.array(V_T)
 
-E__ref = np.loadtxt('psrc/data/Eprimeprime_matrix_976.txt', dtype=np.int32)
-V_ref = np.loadtxt('psrc/data/V_matrix_976.txt', dtype=np.int32)
+E__ref = np.loadtxt('../../data/Eprimeprime_matrix_976.txt', dtype=np.int32)
+V_ref = np.loadtxt('../../data/V_matrix_976.txt', dtype=np.int32)
 #print(E__ == E__ref)
 #temp = (np.matmul(S,B) + E__ref)%65536
 #temp = (np.matmul(S_ref,B_ref) + E__ref)%65536
@@ -68,7 +68,7 @@ V_ref = np.loadtxt('psrc/data/V_matrix_976.txt', dtype=np.int32)
 C = reader_1.read_matrix(4072,8,8,16,signed=False)
 #C = reader_0.read_matrix(4048,8,8,15,signed=False)
 C = np.array(C)
-C_ref = np.loadtxt('psrc/data/C_976.txt', dtype=np.int32)
+C_ref = np.loadtxt('../../data/C_976.txt', dtype=np.int32)
 #print(C==C_ref)
 
 

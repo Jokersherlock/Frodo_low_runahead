@@ -462,7 +462,7 @@ class FrodoKEM(object):
             return processed_chunks
         hex16 = lambda value: hex((value % 2**16)+2**16).replace('0x1','')
         hex8 = lambda value: hex((value % 2**8)+2**8).replace('0x1','')
-        file_path = './data/fpga/Frodo%s/init_%s.txt' % (self.security_level, algorithm)
+        file_path = '../../data/fpga/Frodo%s/init_%s.txt' % (self.security_level, algorithm)
         if os.path.exists(file_path):
             with open(file_path, 'a') as file:
                 file.write('\n// %s \n' % (name))
@@ -747,7 +747,7 @@ class FrodoKEM(object):
         self.write_for_fpga_init("salt", salt, 'decaps', 2**12 + 1344 * 2 + 16 + 4 + 4)
         print('pkh = ' + str(pkh.hex()))
         print('ss = ' + str(ss.hex()))
-        with open('pkh_ss.txt', 'a') as file:
+        with open('../../pkh_ss.txt', 'a') as file:
             file.write('pkh = ' + str(pkh.hex()) + '\n')
             file.write('ss = ' + str(ss.hex()) + '\n')
         # ------------------------------------------------------------

@@ -52,7 +52,6 @@ module Frodo #(
     wire [2:0] R3_mode;
     wire R1_mode, R2_mode;
     wire [3:0] addr_clr, addr_add;
-    wire [2:0] addr_carry;
 
     wire keccak_ready;
     wire sample_en;
@@ -133,7 +132,6 @@ module Frodo #(
         .R2_mode(R2_mode),
         .addr_clr(addr_clr),
         .addr_add(addr_add),
-        .addr_carry(addr_carry)
     );
 
     // AGU模块实例化
@@ -151,7 +149,6 @@ module Frodo #(
         .R2_mode(R2_mode),
         .addr_clr(addr_clr),
         .addr_add(addr_add),
-        .addr_carry(addr_carry),
         .addr_0(addr_0),
         .addr_1(addr_1),
         .addr_2(addr_2),

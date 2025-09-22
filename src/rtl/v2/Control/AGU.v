@@ -10,7 +10,6 @@ module AGU (
     input           R2_mode,
     input  [3:0]    addr_clr,
     input  [3:0]    addr_add,
-    input  [2:0]    addr_carry,//0,1,2分别表示addr1,addr2,addr3是否进位
     // input           addr1_carry,//addr1是否进位
     // input           addr2_carry,//addr2是否进位
     // input           addr3_carry,//addr3是否进位
@@ -94,9 +93,6 @@ module AGU (
         else if(addr_clr[1])begin
             addr_1 <= addr_start_1;
         end
-        else if(addr_carry[0])begin
-            addr_1[16:3] <= addr_1[16:3] + 1'b1;
-        end
         else if(addr_add[1])begin
             case (R1_mode)
                 1'b0: begin
@@ -116,9 +112,6 @@ module AGU (
         end
         else if(addr_clr[2])begin
             addr_2 <= addr_start_2;
-        end
-        else if(addr_carry[1])begin
-            addr_2[16:3] <= addr_2[16:3] + 1'b1;
         end
         else if(addr_add[2])begin
             //addr_2[16:3] <= addr_2[16:3] + 1'b1;
@@ -157,9 +150,6 @@ module AGU (
             //     R3_cnt <= 11'b0;
             // end
             addr_3[16:3] <= addr_start_3[16:3];
-        end
-        else if(addr_carry[2])begin
-            addr_3[16:3] <= addr_3[16:3] + 1'b1;
         end
         else if(addr_add[3])begin
             case (R3_mode)

@@ -20,6 +20,6 @@ def generate_and_save_matrix(rows, cols, min_val, max_val, file_path):
     print(f"Matrix of size {rows}x{cols} saved to {file_path}.")
 
 # 示例调用：
-generate_and_save_matrix(8, 32, -15, 15, "./sim_data/A.txt")
-generate_and_save_matrix(32, 8, -15, 15, "./sim_data/B.txt")
-generate_and_save_matrix(8, 8, -15, 15, "./sim_data/C.txt")
+generate_and_save_matrix(8, 32, -15, 15, "../../sim_data/A.txt")
+generate_and_save_matrix(32, 8, -15, 15, "../../sim_data/B.txt")
+generate_and_save_matrix(8, 8, -15, 15, "../../sim_data/C.txt")

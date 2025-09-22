@@ -49,7 +49,6 @@ module Control(
     output     [2:0]                        R3_mode,
     output                                  R1_mode, R2_mode,
     output     [3:0]                        addr_clr, addr_add,
-    output     [2:0]                        addr_carry,
 
     input                                  keccak_ready,
     output                                 sample_en,
@@ -322,29 +321,28 @@ module Control(
     
     assign addr_clr = uinst[10:7];
     assign addr_add = uinst[14:11];
-    assign addr_carry = uinst[17:15];
     
     wire macs_en;
-    assign macs_en = uinst[18];
+    assign macs_en = uinst[15];
     
     wire ex_en;
-    assign di_valid = uinst[19];
-    assign ex_en = uinst[20];
-    assign ram_reset = uinst[21] | ram_reset_inst;
-    assign hash_dout_en = uinst[22];
+    assign di_valid = uinst[16];
+    assign ex_en = uinst[17];
+    assign ram_reset = uinst[18] | ram_reset_inst;
+    assign hash_dout_en = uinst[19];
     
     wire stall;
-    assign stall = uinst[23];
+    assign stall = uinst[20];
 
     wire mem_wen;
-    assign mem_wen = uinst[24];
+    assign mem_wen = uinst[21];
 
     wire [1:0] a_index;
-    assign a_index = uinst[26:25];
+    assign a_index = uinst[23:22];
     //wire load_en;
-    assign load_en = uinst[27];
+    assign load_en = uinst[24];
    // wire consume_en;
-    assign consume_en = uinst[28];
+    assign consume_en = uinst[25];
 
     reg [15:0] A_line_index;
 
