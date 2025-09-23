@@ -33,6 +33,7 @@ sequence = [
     'SQUEEZE_STRM', # 挤压流操作
     'SQUEEZE',     # 挤压操作
     'AMATMUL',     # A矩阵乘法
+    'ABSORB_STRM', # 流吸收
 ]
 
 binary_codes, instruction_addresses = uinst_assembler.assemble_sequence(sequence)
@@ -51,6 +52,7 @@ opcode_to_address = {
     0b1100: instruction_addresses.get('SQUEEZE_STRM', 0), # SQUEEZE_STRM
     0b1101: instruction_addresses.get('ABSORB_BYTE', 0),  # ABSORB_BYTE
     0b0100: instruction_addresses.get('AMATMUL', 0),     # AMATMUL
+    0b1011: instruction_addresses.get('ABSORB_STRM', 0), # ABSORB_STRM
 }
 
 # 更新mem1中的指令地址
@@ -60,6 +62,7 @@ mem1.modify_word(10, opcode_to_address[0b1010])  # HASH_RND
 mem1.modify_word(12, opcode_to_address[0b1100])  # SQUEEZE_STRM
 mem1.modify_word(13, opcode_to_address[0b1101])  # ABSORB_BYTE
 mem1.modify_word(4, opcode_to_address[0b0100])  # AMATMUL
+mem1.modify_word(5, opcode_to_address[0b1011])  # ABSORB_STRM
 
 
 # 更新mem0中的矩阵地址

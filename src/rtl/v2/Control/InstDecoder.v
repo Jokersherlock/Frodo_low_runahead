@@ -214,10 +214,10 @@ module InstDecoder (
                     loop_3 <= 8'b0;
                 end
                 `AMATMUL:begin
-                    // loop_0 <= level == `FRODO_640  ? 12'd640  :
-                    //           level == `FRODO_976  ? 12'd976  :
-                    //           level == `FRODO_1344 ? 12'd1344 : 12'b0;
-                    loop_0 <= 12'd2;
+                    loop_0 <= level == `FRODO_640  ? 12'd640  :
+                              level == `FRODO_976  ? 12'd976  :
+                              level == `FRODO_1344 ? 12'd1344 : 12'b0;
+                    // loop_0 <= 12'd2;
                     loop_1 <= level == `FRODO_640 ?  8'd7  :
                               level == `FRODO_976 ?  8'd11 :
                               level == `FRODO_1344 ? 8'd15 : 8'b0;

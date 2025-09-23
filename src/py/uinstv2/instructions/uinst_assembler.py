@@ -16,6 +16,7 @@ from .Amatmul import get_amatmul_instructions
 from .hash_rnd import get_hash_rnd_instructions
 from .squeeze import get_squeeze_instructions
 from .squeeze_strm import get_squeeze_strm_instructions
+from .absorb_strm import get_absorb_strm_instructions
 
 class UinstAssembler:
     """通用微指令汇编器类"""
@@ -25,6 +26,7 @@ class UinstAssembler:
         self.instruction_functions = {
             'ABSORB': get_absorb_instructions,
             'ABSORB_BYTE': get_absorb_byte_instructions,
+            'ABSORB_STRM': get_absorb_strm_instructions,
             'AMATMUL': get_amatmul_instructions,
             'HASH_RND': get_hash_rnd_instructions,
             'SQUEEZE': get_squeeze_instructions,

@@ -41,7 +41,14 @@ class Keygen640Generator(FrodoAlgorithmBase):
             {'instruction_type': 'ABSORB',       'fields': {'addr': 0xfc9, 'length': 2, 'ram_index': 0,'ram_reset': 1}},             #吸收z,128bit
             {'instruction_type': 'HASH_RND',     'fields': {'length': 16 , 'mode': 0}},                                 #执行吸收,长度为16*8bit
             {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfc9, 'length':2, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #输出seedA,16bit
-            {'instruction_type':  'AMATMUL',     'fields': {'src0': 1, 'src1': 2, 'dst': 3, 'mode': 0}}
+            {'instruction_type':  'AMATMUL',     'fields': {'src0': 1, 'src1': 2, 'dst': 3, 'mode': 0}},                      #B=AS+E
+            #以下是滥竽充数
+            {'instruction_type': 'ABSORB',       'fields': {'addr':0xfc1, 'length': 2, 'ram_index': 0x00}},             #假装吸收seedA
+            {'instruction_type': 'ABSORB',       'fields': {'addr':0xa81, 'length': 19, 'ram_index': 0x00}},             #假装吸收B的首轮部分,19*64=1216,1216/16=76
+            {'instruction_type': 'HASH_RND',     'fields': {'length': 168 , 'mode': 0}},                                 #假装执行的第一轮吸收
+            {'instruction_type': 'ABSORB_STRM','fields': {'addr': 0xa81, 'loop': 60, 'mode': 0b00}},       #假装吸收B的主体,60*1344/16=5040
+            {'instruction_type': 'HASH_RND',     'fields': {'length': 168 , 'mode': 0}},                                 #假装执行一次吸收
+            {'instruction_type': 'ABSORB',       'fields': {'addr':0xa81, 'length': 1, 'ram_index': 0x00}},   #假装吸收B的剩余,8*640-76-5040=4,4*16=64
         ]
 
 

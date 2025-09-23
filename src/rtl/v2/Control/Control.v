@@ -152,7 +152,7 @@ module Control(
             FINISH:begin
                 case (mode_reg)
                 `KEYGEN:begin
-                    if(level_reg == `FRODO_640 &&pc == 8'd13)begin
+                    if(level_reg == `FRODO_640 &&pc == 8'd19)begin
                         state_nxt = IDLE;
                         valid     = 1'b1;
                     end

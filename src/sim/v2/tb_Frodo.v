@@ -13,7 +13,7 @@ module tb_Frodo;
     reg [1:0] level;
     reg [1:0] mode;
     reg start;
-    parameter TIME = 100000;
+    parameter TIME = 5000000;
     
     // 实例化Frodo模块
     Frodo #(
