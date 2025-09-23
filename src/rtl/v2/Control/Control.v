@@ -60,6 +60,7 @@ module Control(
     output                                 macs_en,
     output                                 macs_mode,
     output                                 macs_signal,
+    output                                 macs_src,
     input      [63:0]                      macs_result,
     output                                 load_en,
     output                                 consume_en,
@@ -151,7 +152,7 @@ module Control(
             FINISH:begin
                 case (mode_reg)
                 `KEYGEN:begin
-                    if(level_reg == `FRODO_640 &&pc == 8'd12)begin
+                    if(level_reg == `FRODO_640 &&pc == 8'd9)begin
                         state_nxt = IDLE;
                         valid     = 1'b1;
                     end
@@ -374,7 +375,7 @@ module Control(
             di_valid_reg <= 1'b0;
         end
         else begin
-            di_valid_reg <= di_valid_reg;
+            di_valid_reg <= di_valid;
         end
     end
     //A参与的乘法,前一时刻di_valid使能,说明此时为吸收过程
@@ -443,6 +444,7 @@ module Control(
         .R0_inverse(R0_inverse),
         .macs_mode(macs_mode),
         .macs_signal(macs_signal),
+        .macs_src(macs_src),
         .done(done),
         .di_len(di_len),
         .hash_in_src(hash_in_src),

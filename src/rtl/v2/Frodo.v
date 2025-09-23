@@ -60,6 +60,7 @@ module Frodo #(
     wire macs_en;
     wire macs_mode;
     wire macs_signal;
+    wire macs_src;
     wire [63:0] macs_result;
     wire load_en;
     wire consume_en;
@@ -116,6 +117,7 @@ module Frodo #(
         .macs_en(macs_en),
         .macs_mode(macs_mode),
         .macs_signal(macs_signal),
+        .macs_src(macs_src),
         .macs_result(macs_result),
         .load_en(load_en),
         .consume_en(consume_en),
@@ -318,6 +320,9 @@ module Frodo #(
         .sample_out(sample_out)
     );
 
+    wire [15:0] b;
+    assign b = macs_src ? Hash_16out : R0_16;
+
 
     Macs u_Macs(
         .clk(clk),
@@ -326,10 +331,10 @@ module Frodo #(
         .a_1(R1_32[15:8]),
         .a_2(R1_32[23:16]),
         .a_3(R1_32[31:24]),
-        .b_0(R0_16),
-        .b_1(R0_16),
-        .b_2(R0_16),
-        .b_3(R0_16),
+        .b_0(b),
+        .b_1(b),
+        .b_2(b),
+        .b_3(b),
         .c_0(R2_out[15:0]),
         .c_1(R2_out[31:16]),
         .c_2(R2_out[47:32]),

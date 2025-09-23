@@ -31,6 +31,7 @@ module InstDecoder (
 
     output reg                              macs_mode,
     output reg                              macs_signal,
+    output reg                              macs_src,
 
     output reg   [10:0]                     di_len,
     output reg                              hash_in_src,
@@ -213,9 +214,10 @@ module InstDecoder (
                     loop_3 <= 8'b0;
                 end
                 `AMATMUL:begin
-                    loop_0 <= level == `FRODO_640  ? 12'd640  :
-                              level == `FRODO_976  ? 12'd976  :
-                              level == `FRODO_1344 ? 12'd1344 : 12'b0;
+                    // loop_0 <= level == `FRODO_640  ? 12'd640  :
+                    //           level == `FRODO_976  ? 12'd976  :
+                    //           level == `FRODO_1344 ? 12'd1344 : 12'b0;
+                    loop_0 <= 12'd1;
                     loop_1 <= level == `FRODO_640 ?  8'd7  :
                               level == `FRODO_976 ?  8'd11 :
                               level == `FRODO_1344 ? 8'd15 : 8'b0;
@@ -390,6 +392,9 @@ module InstDecoder (
             case (opcode)
                 `ABSORB:begin
                     ram_reset_inst <= inst_reg[`INST_WIDTH-22];
+                end
+                `AMATMUL:begin
+                    ram_reset_inst <= 1'b1;
                 end
                 default:begin
                     ram_reset_inst <= 1'b0;
@@ -747,6 +752,45 @@ module InstDecoder (
         end
     end
 
+    always @(posedge clk or negedge rstn) begin
+        if(!rstn)begin
+            R1_mode <= 1'b0;
+        end
+        else if(state_reg == ID)begin
+            case (opcode)
+                `AMATMUL:begin
+                    R1_mode <= 1'b0;
+                end
+                default:begin
+                    R1_mode <= 1'b0;
+                end
+            endcase
+        end
+        else if(state_reg == IDLE || state_reg == FINISH)begin
+            R1_mode <= 1'b0;
+        end
+    end
+
+    always @(posedge clk or negedge rstn) begin
+        if(!rstn)begin
+            R2_mode <= 1'b0;
+        end
+        else if(state_reg == ID)begin
+            case (opcode)
+                `AMATMUL:begin
+                    R2_mode <= 1'b0;
+                end
+                default:begin
+                    R2_mode <= 1'b0;
+                end
+            endcase
+        end
+        else if(state_reg == IDLE || state_reg == FINISH)begin
+            R2_mode <= 1'b0;
+        end
+    end
+
+
 //macs
     always @(posedge clk or negedge rstn) begin
         if(!rstn)begin
@@ -770,7 +814,25 @@ module InstDecoder (
             macs_signal <= 1'b0;
         end
     end
-
+    //0:ram,1:hash
+    always @(posedge clk or negedge rstn) begin
+        if(!rstn)begin
+            macs_src <= 1'b0;
+        end
+        else if(state_reg == ID)begin
+            case (opcode)
+                `AMATMUL:begin
+                    macs_src <= 1'b1;
+                end
+                default:begin
+                    macs_src <= 1'b0;
+                end
+            endcase
+        end
+        else if(state_reg == IDLE || state_reg == FINISH)begin
+            macs_src <= 1'b0;
+        end
+    end
 
 
 endmodule

@@ -41,6 +41,7 @@ class Keygen640Generator(FrodoAlgorithmBase):
             {'instruction_type': 'ABSORB',       'fields': {'addr': 0xfc9, 'length': 2, 'ram_index': 0,'ram_reset': 1}},             #吸收z,128bit
             {'instruction_type': 'HASH_RND',     'fields': {'length': 16 , 'mode': 0}},                                 #执行吸收,长度为16*8bit
             {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfc9, 'length':2, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #输出seedA,16bit
+            {'instruction_type':  'AMATMUL',     'fields': {'src0': 1, 'src1': 2, 'dst': 3, 'mode': 0}}
         ]
 
 
