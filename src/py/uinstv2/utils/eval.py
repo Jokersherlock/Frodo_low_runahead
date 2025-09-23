@@ -46,9 +46,11 @@ B_ref = B_ref%32768
 
 B = reader_1.read_matrix(16,640,8,15)
 B = np.array(B)
-print(B)
-print(B_ref)
-
+# print(B)
+# print(B_ref)
+B_equal = (B == B_ref)
+print("B == B_ref:")
+print(B_equal)
 # # 获取不相同的个数
 # E_different_count = np.sum(~E_equal)
 # print(f"E中不相同的元素个数: {E_different_count}")

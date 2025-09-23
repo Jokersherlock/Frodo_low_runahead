@@ -339,7 +339,7 @@ module Frodo #(
         .c_1(R2_out[31:16]),
         .c_2(R2_out[47:32]),
         .c_3(R2_out[63:48]),
-        .mode(mode_reg),
+        .mode(macs_mode),
         .signal(macs_signal),
         .en(macs_en),
         .result(macs_result),
