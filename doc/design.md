@@ -315,3 +315,16 @@ keccak: di_valid,ex_en,ram_reset,dout_en
 [2:0] upc_st,upc_up
 
 wait
+
+
+
+```python
+while !done:
+    if upc_st[2]:
+    	upc_reg[upc_st[1:0]] = upc + 1
+	if upc_up[2] & loop[]:
+    	upc = upc_reg[upc_up[1:0]]
+	else 
+        upc = upc + 1
+```
+
