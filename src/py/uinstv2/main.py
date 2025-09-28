@@ -34,6 +34,9 @@ sequence = [
     'SQUEEZE',     # 挤压操作
     'AMATMUL',     # A矩阵乘法
     'ABSORB_STRM', # 流吸收
+    'MATMUL',     # 矩阵乘法
+    'ENCDEC',     # 编码/解码
+    'MATADD',     # 矩阵加法
 ]
 
 binary_codes, instruction_addresses = uinst_assembler.assemble_sequence(sequence)
@@ -69,6 +72,10 @@ mem1.modify_word(5, opcode_to_address[0b1011])  # ABSORB_STRM
 mem0.modify_word(1, 0xfc9)   # seedA,z
 mem0.modify_word(2, 0x1a81)   # S
 mem0.modify_word(3, 0x3010)   # E
+mem0.modify_word(4, 0x3a85)   # E"
+mem0.modify_word(5, 0x0010)   # B
+mem0.modify_word(6, 0x1fcb)   # u
+mem0.modify_word(7, 0x0fcf)   # enu
 
 
 print("mem1更新完成:")

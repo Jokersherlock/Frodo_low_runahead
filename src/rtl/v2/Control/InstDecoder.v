@@ -27,11 +27,10 @@ module InstDecoder (
 
     // input  reg  [2:0]                       R0_mask,
     // input  reg                              R1_mask,
-    output reg                              R0_inverse,
 
     output reg                              macs_mode,
     output reg                              macs_signal,
-    output reg                              macs_src,
+    output reg   [1:0]                      macs_src,
 
     output reg   [10:0]                     di_len,
     output reg                              hash_in_src,
@@ -196,7 +195,7 @@ module InstDecoder (
         else if(state_reg == ID)begin
             case (opcode)
                 `ABSORB:begin
-                    loop_0 <= {2'b0,inst_reg[`INST_WIDTH-13:`INST_WIDTH-18],3'b0}; //指令length与64对齐,因此循环数loop0 = length*64/8
+                    loop_0 <= {inst_reg[`INST_WIDTH-27:`INST_WIDTH-28],inst_reg[`INST_WIDTH-13:`INST_WIDTH-18]}; //指令length与8对齐,因此循环数loop0 = length*64/8
                     loop_1 <= 8'b0;
                     loop_2 <= 8'b0;
                     loop_3 <= 8'b0;
@@ -208,7 +207,7 @@ module InstDecoder (
                     loop_3 <= 8'b0;
                 end
                 `SQUEEZE:begin
-                    loop_0 <= {3'b0,inst_reg[`INST_WIDTH-13:`INST_WIDTH-18],2'b0}; //指令length与64对齐,因此循环数loop0 = length*64/16
+                    loop_0 <= {inst_reg[`INST_WIDTH-27:`INST_WIDTH-28],inst_reg[`INST_WIDTH-13:`INST_WIDTH-18]}; //指令length与8对齐,因此循环数loop0 = length*64/16
                     loop_1 <= 8'b0;
                     loop_2 <= 8'b0;
                     loop_3 <= 8'b0;
@@ -243,6 +242,20 @@ module InstDecoder (
                         loop_2 <= 8'd16;
                         loop_3 <= 8'd0;
                     end
+                end
+                `MATMUL:begin
+                    loop_0 <= level == `FRODO_640 ? 8'd640 :
+                              level == `FRODO_976 ? 8'd976 :
+                              level == `FRODO_1344 ? 8'd1344 : 8'b0;
+                    loop_1 <= 8'd8;
+                    loop_2 <= 8'd0;
+                    loop_3 <= 8'd0;
+                end
+                `MATADD:begin
+                    loop_0 <= 8'd8;
+                    loop_1 <= 8'd0;
+                    loop_2 <= 8'd0;
+                    loop_3 <= 8'd0;
                 end
                 default:begin
                     loop_0 <= 12'b0;
@@ -396,6 +409,9 @@ module InstDecoder (
                 `AMATMUL:begin
                     ram_reset_inst <= 1'b1;
                 end
+                `ABSORB_STRM:begin
+                    ram_reset_inst <= inst_reg[`INST_WIDTH-22];
+                end
                 default:begin
                     ram_reset_inst <= 1'b0;
                 end
@@ -406,25 +422,6 @@ module InstDecoder (
         end
     end
 
-    //R0_inverse
-    always @(posedge clk or negedge rstn) begin
-        if(!rstn)begin
-            R0_inverse <= 1'b0;
-        end
-        else if(state_reg == ID)begin
-            case (opcode)
-                `ABSORB:begin
-                    R0_inverse <= inst_reg[`INST_WIDTH-21];
-                end
-                default:begin
-                    R0_inverse <= 1'b0;
-                end
-            endcase
-        end
-        else if(state_reg == IDLE || state_reg == FINISH)begin
-            R0_inverse <= 1'b0;
-        end
-    end
 
     //sample_en
     always @(posedge clk or negedge rstn) begin
@@ -464,13 +461,22 @@ module InstDecoder (
         else if(state_reg == ID)begin
             case (opcode)
                 `ABSORB:begin
-                    R0_mode <= NORMAL8;
+                    R0_mode <= inst_reg[`INST_WIDTH-21] ? READBP : NORMAL8;
+                end
+                `ABSORB_STRM:begin
+                    R0_mode <= inst_reg[`INST_WIDTH-21] ? READBP : NORMAL8;
                 end
                 `AMATMUL:begin
                     R0_mode <= NORMAL8;
                 end
                 `ENCDEC:begin
                     R0_mode <= NORMAL16;
+                end
+                `MATMUL:begin
+                    R0_mode <= NORMAL16;
+                end
+                `MATADD:begin
+                    R0_mode <= NORMAL64;
                 end
                 default:begin
                     R0_mode <= NORMAL64;
@@ -531,10 +537,16 @@ module InstDecoder (
                     endcase
                 end
                 `AMATMUL:begin
-                    R3_mode <= inst_reg[`INST_WIDTH-22] ? WRITE64 : AMATMUL;
+                    R3_mode <= WRITE64;
                 end
                 `ENCDEC:begin
                     R3_mode <= WRITE16;
+                end
+                `MATMUL:begin
+                    R3_mode <= WRITE64;
+                end
+                `MATADD:begin
+                    R3_mode <= WRITE64;
                 end
                 default:begin
                     R3_mode <= WRITE64;
@@ -607,6 +619,31 @@ module InstDecoder (
                         end
                         3'b100:begin
                             addr_start_1 <= {mem0_rd_data_0[13:0],3'b0};
+                        end
+                        3'b101:begin
+                            addr_start_2 <= {mem0_rd_data_0[13:0],3'b0};
+                            addr_start_3 <= {mem0_rd_data_0[13],~mem0_rd_data_0[12],mem0_rd_data_0[11:0],3'b0};
+                        end
+                    endcase
+                end
+                `MATMUL:begin
+                case(ID_cnt)
+                    3'b011:begin
+                        addr_start_0 <= {mem0_rd_data_0[13:0],3'b0};
+                    end
+                    3'b100:begin
+                        addr_start_1 <= {mem0_rd_data_0[13:0],3'b0};
+                    end
+                    3'b101:begin
+                        addr_start_2 <= {mem0_rd_data_0[13:0],3'b0};
+                        addr_start_3 <= {mem0_rd_data_0[13],~mem0_rd_data_0[12],mem0_rd_data_0[11:0],3'b0};
+                    end
+                endcase
+                end
+                `MATADD:begin
+                    case(ID_cnt)
+                        3'b011:begin
+                            addr_start_0 <= {mem0_rd_data_0[13:0],3'b0};
                         end
                         3'b101:begin
                             addr_start_2 <= {mem0_rd_data_0[13:0],3'b0};
@@ -704,6 +741,18 @@ module InstDecoder (
                     R2_en <= 1'b0;
                     R3_en <= 2'b10;
                 end
+                `MATMUL:begin
+                    R0_en <= 1'b1;
+                    R1_en <= 1'b1;
+                    R2_en <= 1'b1;
+                    R3_en <= 2'b11;
+                end
+                `MATADD:begin
+                    R0_en <= 1'b1;
+                    R1_en <= 1'b0;
+                    R2_en <= 1'b1;
+                    R3_en <= 2'b11;
+                end
                 default:begin
                     R0_en <= 1'b0;
                     R1_en <= 1'b0;
@@ -745,6 +794,12 @@ module InstDecoder (
                 `ENCDEC:begin
                     R3_src <= inst_reg[`INST_WIDTH-22] ? DECODE : ENCODE;
                 end
+                `MATMUL:begin
+                    R3_src <= MACS;
+                end
+                `MATADD:begin
+                    R3_src <= MACS;
+                end
                 default:begin
                     R3_src <= 3'b000;
                 end
@@ -759,7 +814,10 @@ module InstDecoder (
         else if(state_reg == ID)begin
             case (opcode)
                 `AMATMUL:begin
-                    R1_mode <= 1'b0;
+                    R1_mode <= inst_reg[`INST_WIDTH-22];
+                end
+                `MATMUL:begin
+                    R1_mode <= inst_reg[`INST_WIDTH-22];
                 end
                 default:begin
                     R1_mode <= 1'b0;
@@ -778,7 +836,13 @@ module InstDecoder (
         else if(state_reg == ID)begin
             case (opcode)
                 `AMATMUL:begin
-                    R2_mode <= 1'b0;
+                    R2_mode <= inst_reg[`INST_WIDTH-22];
+                end
+                `MATMUL:begin
+                    R2_mode <= inst_reg[`INST_WIDTH-22];
+                end
+                `MATADD:begin
+                    R2_mode <= 1'b1;
                 end
                 default:begin
                     R2_mode <= 1'b0;
@@ -803,6 +867,14 @@ module InstDecoder (
                     macs_mode <= 1'b0;
                     macs_signal <= 1'b0;
                 end
+                `MATMUL:begin
+                    macs_mode <= 1'b0;
+                    macs_signal <= inst_reg[`INST_WIDTH-21];
+                end
+                `MATADD:begin
+                    macs_mode <= 1'b1;
+                    macs_signal <= 1'b0;//反正用不到减法
+                end
                 default:begin
                     macs_mode <= 1'b0;
                     macs_signal <= 1'b0;
@@ -814,23 +886,26 @@ module InstDecoder (
             macs_signal <= 1'b0;
         end
     end
-    //0:ram,1:hash
+    //00:ram,01:hash,10:4ram
     always @(posedge clk or negedge rstn) begin
         if(!rstn)begin
-            macs_src <= 1'b0;
+            macs_src <= 2'b00;
         end
         else if(state_reg == ID)begin
             case (opcode)
                 `AMATMUL:begin
-                    macs_src <= 1'b1;
+                    macs_src <= 2'b01;
+                end
+                `MATADD:begin
+                    macs_src <= 2'b10;
                 end
                 default:begin
-                    macs_src <= 1'b0;
+                    macs_src <= 2'b00;
                 end
             endcase
         end
         else if(state_reg == IDLE || state_reg == FINISH)begin
-            macs_src <= 1'b0;
+            macs_src <= 2'b00;
         end
     end
 

@@ -46,6 +46,7 @@ class FrodoAssembler:
                     'src0': {'bits': 4, 'offset': 24},             # 源操作数0 (位27-24)
                     'src1': {'bits': 4, 'offset': 20},            # 源操作数1 (位23-20)
                     'dst': {'bits': 4, 'offset': 16},             # 目标操作数 (位19-16)
+                    'signal': {'bits': 1, 'offset': 7},             # 符号 (位7)
                     'mode': {'bits': 1, 'offset': 6},             # 模式 (位6)
                     'opcode': {'bits': 4, 'offset': 2},           # 操作码 (位5-2)
                 }
@@ -53,7 +54,7 @@ class FrodoAssembler:
             'MOV': {
                 'description': '数据移动',
                 'required_fields': ['src0', 'dst', 'length'],
-                'default_values': {'mode': 0},
+                'default_values': {'mode': 0, 'signal': 0},
                 'fields': {
                     'src0': {'bits': 4, 'offset': 24},             # 源操作数0 (位27-24)
                     'length_high': {'bits': 4, 'offset': 20},      # length[9:6] (位23-20)
@@ -91,16 +92,17 @@ class FrodoAssembler:
             'ABSORB': {
                 'description': '吸收操作',
                 'required_fields': ['addr', 'length', 'ram_index'],
-                'optional_fields': ['flag15to8','inverse','ram_reset'],
-                'default_values': {'flag15to8': 0, 'inverse': 0, 'ram_reset': 0},
+                'optional_fields': ['flag15to8','ram_reset'],
+                'default_values': {'flag15to8': 0, 'mode': 0, 'ram_reset': 0},
                 'fields': {
-                    'addr': {'bits': 12, 'offset': 16},             # 地址 (位27-24)
-                    'length': {'bits': 6, 'offset': 10},          # 长度 (位15-10)
-                    'ram_index': {'bits': 1, 'offset': 9},        # RAM索引 (位9)
-                    'flag15to8': {'bits': 1, 'offset': 8},        # 保留位 (位8-7)
-                    'inverse': {'bits': 1, 'offset': 7},             # 模式 (位6)
-                    'ram_reset': {'bits': 1, 'offset': 6},             # 模式 (位6)
-                    'opcode': {'bits': 4, 'offset': 2},           # 操作码 (位5-2)
+                    'addr': {'bits': 12, 'offset': 16},             # 地址 (位27-16)
+                    'length_low': {'bits': 6, 'offset': 10},        # length[5:0] (位15-10)
+                    'ram_index': {'bits': 1, 'offset': 9},           # RAM索引 (位9)
+                    'flag15to8': {'bits': 1, 'offset': 8},           # 保留位 (位8)
+                    'mode': {'bits': 1, 'offset': 7},              # 模式 (位7)
+                    'ram_reset': {'bits': 1, 'offset': 6},           # 模式 (位6)
+                    'opcode': {'bits': 4, 'offset': 2},              # 操作码 (位5-2)
+                    'length_high': {'bits': 2, 'offset': 0},         # length[7:6] (位1-0)
                 }
             },
             'SQUEEZE': {
@@ -109,12 +111,13 @@ class FrodoAssembler:
                 'optional_fields': ['sample'],
                 'default_values': {'sample': 0},
                 'fields': {
-                    'addr': {'bits': 12, 'offset': 16},             # 地址 (位27-24)
-                    'length': {'bits': 6, 'offset': 10},          # 长度 (位15-10)
-                    'ram_index': {'bits': 1, 'offset': 9},        # RAM索引 (位9)
-                    'mode': {'bits': 2, 'offset': 7},        # 保留位 (位8-7)
-                    'sample': {'bits': 1, 'offset': 6},             # 模式 (位6)
-                    'opcode': {'bits': 4, 'offset': 2},           # 操作码 (位5-2)
+                    'addr': {'bits': 12, 'offset': 16},             # 地址 (位27-16)
+                    'length_low': {'bits': 6, 'offset': 10},        # length[5:0] (位15-10)
+                    'ram_index': {'bits': 1, 'offset': 9},           # RAM索引 (位9)
+                    'mode': {'bits': 2, 'offset': 7},                # 模式 (位8-7)
+                    'sample': {'bits': 1, 'offset': 6},              # 采样 (位6)
+                    'opcode': {'bits': 4, 'offset': 2},              # 操作码 (位5-2)
+                    'length_high': {'bits': 2, 'offset': 0},         # length[7:6] (位1-0)
                 }
             },
             'HASH_RND': {
@@ -146,14 +149,15 @@ class FrodoAssembler:
             'ABSORB_STRM': {
                 'description': '流吸收',
                 'required_fields': ['addr', 'mode'],
-                'optional_fields': [],
-                'default_values': {},
+                'optional_fields': ['flag15to8','ram_reset'],
+                'default_values': {'flag15to8': 0,'mode': 0,'ram_reset': 0},
                 'fields': {
                     'addr': {'bits': 12, 'offset': 16},             # 地址 (位27-16)
                     'loop_low': {'bits': 6, 'offset': 10},         # loop[5:0] (位15-10)
                     'ram_index': {'bits': 1, 'offset': 9},         # RAM索引 (位9)
-                    'mode': {'bits': 2, 'offset': 7},              # 模式 (位8-7)
-                    'reserved': {'bits': 1, 'offset': 6},          # 保留位 (位6)
+                    'flag15to8': {'bits': 1, 'offset': 8},           # 保留位 (位8)
+                    'mode': {'bits': 1, 'offset': 7},              # 模式 (位7)
+                    'ram_reset': {'bits': 1, 'offset': 6},           # 模式 (位6)
                     'opcode': {'bits': 4, 'offset': 2},            # 操作码 (位5-2)
                     'loop_high': {'bits': 2, 'offset': 0},         # loop[7:6] (位1-0)
                 }
@@ -270,11 +274,37 @@ class FrodoAssembler:
                     if pos < 28:
                         binary[pos] = bit
         
+        # 特殊处理ABSORB和SQUEEZE指令的length字段分割
+        if instruction_type in ['ABSORB', 'SQUEEZE'] and 'length' in instruction_dict:
+            length_value = instruction_dict['length']
+            # 分割length字段
+            length_high = (length_value >> 6) & 0x3  # length[7:6]
+            length_low = length_value & 0x3F         # length[5:0]
+            
+            # 设置分割后的字段
+            if 'length_high' in fields_to_use:
+                config = fields_to_use['length_high']
+                bin_str = format(length_high, f'0{config["bits"]}b')
+                for i, bit in enumerate(bin_str):
+                    pos = config['offset'] + (config['bits'] - 1 - i)
+                    if pos < 28:
+                        binary[pos] = bit
+            
+            if 'length_low' in fields_to_use:
+                config = fields_to_use['length_low']
+                bin_str = format(length_low, f'0{config["bits"]}b')
+                for i, bit in enumerate(bin_str):
+                    pos = config['offset'] + (config['bits'] - 1 - i)
+                    if pos < 28:
+                        binary[pos] = bit
+        
         for field, value in instruction_dict.items():
             # 跳过已特殊处理的字段
             if instruction_type == 'MOV' and field == 'length':
                 continue
             if instruction_type in ['SQUEEZE_STRM', 'ABSORB_STRM'] and field == 'loop':
+                continue
+            if instruction_type in ['ABSORB', 'SQUEEZE'] and field == 'length':
                 continue
                 
             if field not in fields_to_use:
@@ -368,11 +398,42 @@ class FrodoAssembler:
             # 合并loop字段
             result['loop'] = (loop_high << 6) | loop_low
         
+        # 特殊处理ABSORB和SQUEEZE指令的length字段合并
+        if instruction_type in ['ABSORB', 'SQUEEZE']:
+            # 提取length_high和length_low字段
+            length_high = 0
+            length_low = 0
+            
+            if 'length_high' in fields_to_use:
+                config = fields_to_use['length_high']
+                # 提取字段位，注意位序
+                field_bits = []
+                for i in range(config['bits']):
+                    pos = config['offset'] + (config['bits'] - 1 - i)
+                    if pos < len(binary):
+                        field_bits.append(binary[pos])
+                length_high = int(''.join(field_bits), 2)
+            
+            if 'length_low' in fields_to_use:
+                config = fields_to_use['length_low']
+                # 提取字段位，注意位序
+                field_bits = []
+                for i in range(config['bits']):
+                    pos = config['offset'] + (config['bits'] - 1 - i)
+                    if pos < len(binary):
+                        field_bits.append(binary[pos])
+                length_low = int(''.join(field_bits), 2)
+            
+            # 合并length字段
+            result['length'] = (length_high << 6) | length_low
+        
         for field, config in fields_to_use.items():
             # 跳过已特殊处理的字段
             if instruction_type == 'MOV' and field in ['length_high', 'length_low']:
                 continue
             if instruction_type in ['SQUEEZE_STRM', 'ABSORB_STRM'] and field in ['loop_high', 'loop_low']:
+                continue
+            if instruction_type in ['ABSORB', 'SQUEEZE'] and field in ['length_high', 'length_low']:
                 continue
                 
             start = config['offset']

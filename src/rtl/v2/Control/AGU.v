@@ -63,15 +63,29 @@ module AGU (
                 //     end
                 // end
                 READBP: begin
-                    if(R0_cnt == loop)begin//地址满n时。低位地址加1,等效于128位对齐
-                        //addr_0[14:3] <= addr_start_0[14:3];
-                        addr_0[3:0]  <= addr_0[3:0] + 1'b1;
-                        addr_0[14:4] <= addr_start_0[14:4];
+                    // if(R0_cnt == loop)begin//地址满n时。低位地址加1,等效于128位对齐
+                    //     //addr_0[14:3] <= addr_start_0[14:3];
+                    //     addr_0[3:0]  <= addr_0[3:0] + 1'b1;
+                    //     addr_0[14:4] <= addr_start_0[14:4];
+                    //     R0_cnt <= 11'b0;
+                    // end
+                    // else begin
+                    //     addr_0[14:4] <= addr_0[14:4] + 1'b1;
+                    //     R0_cnt <= R0_cnt + 1'b1;
+                    // end
+                    if(R0_cnt == loop)begin
+                        addr_0[14:3] <= addr_0[14:3] + 1'b1;
+                        R0_cnt <= 11'b0;
+                        addr_0[3:1] <= addr_0[3:1] + 1'b1;
+                        addr_0[0] <= ~addr_0[0];
+                    end
+                    else if(addr_0[0])begin
+                        addr_0[0] <= ~addr_0[0];
+                        addr_0[14:4] <= addr_0[14:4] + 1'b1;
                         R0_cnt <= 11'b0;
                     end
                     else begin
-                        addr_0[14:4] <= addr_0[14:4] + 1'b1;
-                        R0_cnt <= R0_cnt + 1'b1;
+                        addr_0[0] <= ~addr_0[0];
                     end
                 end
                 default: begin

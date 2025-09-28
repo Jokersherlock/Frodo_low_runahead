@@ -32,6 +32,7 @@ module Control(
     output     [1:0]                        R3_en,
     input     [2:0]                        R0_mask,
     input                                  R1_mask,
+    output     [63:0]                       R0_out,
     output     [31:0]                       R1_32,
     output     [15:0]                       R0_16,
     output     [7:0]                        R0_8,
@@ -60,7 +61,7 @@ module Control(
     output                                 macs_en,
     output                                 macs_mode,
     output                                 macs_signal,
-    output                                 macs_src,
+    output     [1:0]                       macs_src,
     input      [63:0]                      macs_result,
     output                                 load_en,
     output                                 consume_en,
@@ -152,7 +153,7 @@ module Control(
             FINISH:begin
                 case (mode_reg)
                 `KEYGEN:begin
-                    if(level_reg == `FRODO_640 &&pc == 8'd19)begin
+                    if(level_reg == `FRODO_640 &&pc == 8'd22)begin
                         state_nxt = IDLE;
                         valid     = 1'b1;
                     end
@@ -287,7 +288,6 @@ module Control(
     wire [2:0] lut_flag;
 //    wire [2:0] R0_mask;
 //    wire R1_mask;
-    wire R0_inverse;
     // wire macs_mode;
     // wire macs_signal;
     wire [10:0] di_len;
@@ -300,7 +300,7 @@ module Control(
     wire [`UINST_ADDR_WIDTH-1:0] upc;
     wire ucontrol_start;
 
-    wire [63:0] R0_out,R1_out,R3_out;
+    wire [63:0] R1_out,R3_out;
     assign mem_wr_data = R3_out;
     // wire [32:0] R1_32;
     // wire [15:0] R0_16;
@@ -441,7 +441,6 @@ module Control(
         .R2_mode(R2_mode),
         // .R0_mask(R0_mask),
         // .R1_mask(R1_mask),
-        .R0_inverse(R0_inverse),
         .macs_mode(macs_mode),
         .macs_signal(macs_signal),
         .macs_src(macs_src),
@@ -501,7 +500,6 @@ module Control(
         .R3_in(R3_in),
         .R0_mask(R0_mask),
         .R1_mask(R1_mask),
-        .R0_inverse(R0_inverse),
         .R0_out(R0_out),
         .R1_out(R1_out),
         .R2_out(R2_out),

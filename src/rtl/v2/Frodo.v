@@ -33,6 +33,7 @@ module Frodo #(
     wire [2:0] R0_mask;
     wire R1_mask;
     wire [7:0] R3_mask;
+    wire [63:0] R0_out;
     wire [31:0] R1_32;
     wire [15:0] R0_16;
     wire [7:0] R0_8;
@@ -60,7 +61,7 @@ module Frodo #(
     wire macs_en;
     wire macs_mode;
     wire macs_signal;
-    wire macs_src;
+    wire [1:0] macs_src;
     wire [63:0] macs_result;
     wire load_en;
     wire consume_en;
@@ -96,6 +97,7 @@ module Frodo #(
         .R3_en(R3_en),
         .R0_mask(R0_mask),
         .R1_mask(R1_mask),
+        .R0_out(R0_out),
         .R1_32(R1_32),
         .R0_16(R0_16),
         .R0_8(R0_8),
@@ -112,17 +114,17 @@ module Frodo #(
         .keccak_ready(keccak_ready),
         .sample_en(sample_en),
         .sample_out(sample_out),
-        .hash_16out(Hash_16out),
+        .hash_16out({Hash_16out[7:0],Hash_16out[15:8]}),
         .mem_wen(mem_wen),
         .macs_en(macs_en),
         .macs_mode(macs_mode),
         .macs_signal(macs_signal),
         .macs_src(macs_src),
-        .macs_result(macs_result),
+        .macs_result({macs_result[55:48],macs_result[63:56],macs_result[39:32],macs_result[47:40],macs_result[15:8],macs_result[23:16],macs_result[7:0],macs_result[15:8]}),
         .load_en(load_en),
         .consume_en(consume_en),
-        .data_encode(data_encode),
-        .data_decode(data_decode),
+        .data_encode({data_encode[7:0],data_encode[15:8]}),
+        .data_decode({data_decode[7:0],data_decode[15:8]}),
         // AGU相关输出
         .addr_start_0(addr_start_0),
         .addr_start_1(addr_start_1),
@@ -321,7 +323,7 @@ module Frodo #(
     );
 
     wire [15:0] b;
-    assign b = macs_src ? Hash_16out : R0_16;
+    assign b = macs_src == 2'b01? Hash_16out : R0_16;
 
 
     Macs u_Macs(
@@ -331,10 +333,10 @@ module Frodo #(
         .a_1(R1_32[15:8]),
         .a_2(R1_32[23:16]),
         .a_3(R1_32[31:24]),
-        .b_0(b),
-        .b_1(b),
-        .b_2(b),
-        .b_3(b),
+        .b_0(macs_src == 2'b10 ? R0_out[15:0] : b),
+        .b_1(macs_src == 2'b10 ? R0_out[31:16] : b),
+        .b_2(macs_src == 2'b10 ? R0_out[47:32] : b),
+        .b_3(macs_src == 2'b10 ? R0_out[63:48] : b),
         .c_0(R2_out[15:0]),
         .c_1(R2_out[31:16]),
         .c_2(R2_out[47:32]),

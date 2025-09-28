@@ -4,7 +4,6 @@ module Register(
     input       [63:0]      R0_in,R1_in,R2_in,R3_in,
     input       [2:0]       R0_mask,
     input                   R1_mask,
-    input                   R0_inverse,
     
     output      [63:0]      R0_out,R1_out,R2_out,R3_out,
     output      [31:0]      R1_32,
@@ -42,12 +41,7 @@ module Register(
     end
 
     always@(*) begin
-        if(R0_inverse)begin
-            R0_8 = R0_mask[0] ? R0_16[7:0] : R0_16[15:8];
-        end
-        else begin
-            R0_8 = R0_mask[0] ? R0_16[15:8] : R0_16[7:0];
-        end
+        R0_8 = R0_mask[0] ? R0_16[15:8] : R0_16[7:0];
     end
 
 endmodule
