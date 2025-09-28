@@ -400,7 +400,7 @@ module Control(
                 R3_in = {4{hash_16out}};
             end
             SAMPLE:begin
-                R3_in = R3_en == 2'b01 ? {8{sample_out}} : {4{{8{sample_out[7]}},sample_out}};
+                R3_in = R3_en == 2'b01 ? {8{sample_out}} : {4{sample_out,{8{sample_out[7]}}}};
             end
             MACS:begin
                 R3_in = macs_result;

@@ -56,16 +56,23 @@ opcode_to_address = {
     0b1101: instruction_addresses.get('ABSORB_BYTE', 0),  # ABSORB_BYTE
     0b0100: instruction_addresses.get('AMATMUL', 0),     # AMATMUL
     0b1011: instruction_addresses.get('ABSORB_STRM', 0), # ABSORB_STRM
+    0b0010: instruction_addresses.get('MATMUL', 0),     # MATMUL
+    0b0001: instruction_addresses.get('ENCDEC', 0),     # ENCDEC
+    0b0101: instruction_addresses.get('MATADD', 0),     # MATADD
 }
 
-# 更新mem1中的指令地址
-mem1.modify_word(8, opcode_to_address[0b1000])   # ABSORB
-mem1.modify_word(9, opcode_to_address[0b1001])   # SQUEEZE
-mem1.modify_word(10, opcode_to_address[0b1010])  # HASH_RND
-mem1.modify_word(12, opcode_to_address[0b1100])  # SQUEEZE_STRM
-mem1.modify_word(13, opcode_to_address[0b1101])  # ABSORB_BYTE
-mem1.modify_word(4, opcode_to_address[0b0100])  # AMATMUL
-mem1.modify_word(5, opcode_to_address[0b1011])  # ABSORB_STRM
+# 更新mem1中的指令地址（地址 = 操作码）
+mem1.modify_word(0x1, opcode_to_address[0b0001])   # ENCDEC
+mem1.modify_word(0x2, opcode_to_address[0b0010])   # MATMUL
+mem1.modify_word(0x4, opcode_to_address[0b0100])   # AMATMUL
+mem1.modify_word(0x5, opcode_to_address[0b0101])   # MATADD
+mem1.modify_word(0x8, opcode_to_address[0b1000])    # ABSORB
+mem1.modify_word(0x9, opcode_to_address[0b1001])    # SQUEEZE
+mem1.modify_word(0xA, opcode_to_address[0b1010])   # HASH_RND
+mem1.modify_word(0xB, opcode_to_address[0b1011])    # ABSORB_STRM
+mem1.modify_word(0xC, opcode_to_address[0b1100])    # SQUEEZE_STRM
+mem1.modify_word(0xD, opcode_to_address[0b1101])   # ABSORB_BYTE
+
 
 
 # 更新mem0中的矩阵地址
@@ -79,9 +86,14 @@ mem0.modify_word(7, 0x0fcf)   # enu
 
 
 print("mem1更新完成:")
+print(f"  ENCDEC (0x1): 地址 {opcode_to_address[0b0001]}")
+print(f"  MATMUL (0x2): 地址 {opcode_to_address[0b0010]}")
+print(f"  AMATMUL (0x4): 地址 {opcode_to_address[0b0100]}")
+print(f"  MATADD (0x5): 地址 {opcode_to_address[0b0101]}")
 print(f"  ABSORB (0x8): 地址 {opcode_to_address[0b1000]}")
 print(f"  SQUEEZE (0x9): 地址 {opcode_to_address[0b1001]}")
 print(f"  HASH_RND (0xA): 地址 {opcode_to_address[0b1010]}")
+print(f"  ABSORB_STRM (0xB): 地址 {opcode_to_address[0b1011]}")
 print(f"  SQUEEZE_STRM (0xC): 地址 {opcode_to_address[0b1100]}")
 print(f"  ABSORB_BYTE (0xD): 地址 {opcode_to_address[0b1101]}")
 

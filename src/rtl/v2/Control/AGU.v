@@ -174,7 +174,8 @@ module AGU (
     localparam GENS    = 3'b011;//生成S,S'
     localparam GENEP   = 3'b100;//生成E'
     localparam MATRAN  = 3'b101;//矩阵转置
-    localparam AMATMUL = 3'b110;//A矩阵乘法
+    localparam AMATMUL = 3'b110;//A矩阵乘法,左乘
+    localparam MATMULA = 3'b111;//A矩阵乘法,右乘
     reg [11:0] R3_cnt;//R3计数器
     always @(posedge clk or negedge rstn) begin
         if(!rstn)begin
@@ -245,6 +246,16 @@ module AGU (
                     end
                     else begin
                         addr_3[3] <= ~addr_3[3];
+                        R3_cnt <= R3_cnt + 1'b1;
+                    end
+                end
+                MATMULA: begin
+                    if(R3_cnt[11:1] == loop & R3_cnt[3] == 1'b1)begin
+                        addr_3[16:3] <= addr_start_3[16:3];
+                        R3_cnt <= 11'b0;
+                    end
+                    else begin
+                        addr_3[16:3] <= addr_3[16:3] + 1'b1;
                         R3_cnt <= R3_cnt + 1'b1;
                     end
                 end

@@ -200,6 +200,12 @@ module InstDecoder (
                     loop_2 <= 8'b0;
                     loop_3 <= 8'b0;
                 end
+                `ABSORB_STRM:begin
+                    loop_0 <= {inst_reg[`INST_WIDTH-27:`INST_WIDTH-28],inst_reg[`INST_WIDTH-13:`INST_WIDTH-18]};
+                    loop_1 <= 8'b0;
+                    loop_2 <= 8'b0;
+                    loop_3 <= 8'b0;
+                end
                 `SQUEEZE_STRM:begin
                     loop_0 <= {inst_reg[`INST_WIDTH-27:`INST_WIDTH-28],inst_reg[`INST_WIDTH-13:`INST_WIDTH-18]};
                     loop_1 <= level == `FRODO_640 ? 8'd84 : 8'd68;
@@ -495,7 +501,8 @@ module InstDecoder (
     localparam GENS    = 3'b011;//生成S,S'
     localparam GENEP   = 3'b100;//生成E'
     localparam MATRAN  = 3'b101;//矩阵转置
-    localparam AMATMUL = 3'b110;//A矩阵乘法
+    localparam AMATMUL = 3'b110;//A矩阵乘法,左乘
+    localparam MATMULA = 3'b111;//A矩阵乘法,右乘
 
     always @(posedge clk or negedge rstn) begin
 
@@ -537,7 +544,7 @@ module InstDecoder (
                     endcase
                 end
                 `AMATMUL:begin
-                    R3_mode <= WRITE64;
+                    R3_mode <= inst_reg[`INST_WIDTH-22] ? MATMULA : AMATMUL;
                 end
                 `ENCDEC:begin
                     R3_mode <= WRITE16;

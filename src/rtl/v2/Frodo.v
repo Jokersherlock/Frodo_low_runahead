@@ -323,7 +323,7 @@ module Frodo #(
     );
 
     wire [15:0] b;
-    assign b = macs_src == 2'b01? Hash_16out : R0_16;
+    assign b = macs_src == 2'b01 ? Hash_16out : R0_16;
 
 
     Macs u_Macs(

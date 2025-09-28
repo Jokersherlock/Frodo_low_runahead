@@ -43,7 +43,7 @@ class Encaps640Generator(FrodoAlgorithmBase):
             {'instruction_type': 'HASH_RND',     'fields': {'length': 168 , 'mode': 0}},                                 #假装执行一次吸收
             {'instruction_type': 'ABSORB',       'fields': {'addr':0xa81, 'length': 17, 'ram_index': 0x00,'flag15to8': 1}},   #假装吸收B的剩余,8*640-76-5040=4,4*16=64
             {'instruction_type': 'HASH_RND',     'fields': {'length': 8 , 'mode': 0}},                                 #执行一次吸收
-            {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xa81, 'length':16, 'ram_index': 1, 'mode': 0b10,'sample': 0}}, #挤出pkh
+            {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xa81, 'length':8, 'ram_index': 1, 'mode': 0b10,'sample': 0}}, #挤出pkh
 
 
             #生成seedSE
@@ -58,14 +58,14 @@ class Encaps640Generator(FrodoAlgorithmBase):
             {'instruction_type': 'ABSORB',       'fields': {'addr': 0xfc1, 'length': 32, 'ram_index': 0x00}},            #吸收seedse,256bit
             {'instruction_type': 'HASH_RND',     'fields': {'length': 33 , 'mode': 0}},                                 #执行吸收,长度为33*8bit
             {'instruction_type': 'SQUEEZE_STRM', 'fields': {'addr': 0xa81, 'loop': 60, 'mode': 0b00,'sample': 1}},    #输出S'的主体
-            {'instruction_type': 'SQUEEZE',      'fields': {'addr': 3249, 'length': 160, 'ram_index': 0, 'mode': 0b00,'sample': 1}}, #输出S'剩余
-            {'instruction_type': 'SQUEEZE',      'fields': {'addr': 0x10, 'length': 8, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #输出E'首轮
+            {'instruction_type': 'SQUEEZE',      'fields': {'addr': 3249, 'length': 80, 'ram_index': 0, 'mode': 0b00,'sample': 1}}, #输出S'剩余
+            {'instruction_type': 'SQUEEZE',      'fields': {'addr': 0x10, 'length': 4, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #输出E'首轮
             {'instruction_type': 'HASH_RND',     'fields': {'length': 0 , 'mode': 1}},                                 #执行一次挤压
             {'instruction_type': 'SQUEEZE_STRM','fields': {'addr':17, 'loop': 60, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #输出E'主体
-            {'instruction_type': 'SQUEEZE',      'fields': {'addr': 1277, 'length': 152, 'ram_index': 1, 'mode': 0b10,'sample': 1}},  #输出E'剩余
-            {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xa85, 'length':8, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #挤出E"首轮
+            {'instruction_type': 'SQUEEZE',      'fields': {'addr': 1277, 'length': 76, 'ram_index': 1, 'mode': 0b10,'sample': 1}},  #输出E'剩余
+            {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xa85, 'length':4, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #挤出E"首轮
             {'instruction_type': 'HASH_RND',     'fields': {'length': 0 , 'mode': 1}},                                 #执行一次挤压
-            {'instruction_type': 'SQUEEZE' ,     'fields': {'addr':0xa86, 'length': 120, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #输出E"主体
+            {'instruction_type': 'SQUEEZE' ,     'fields': {'addr':0xa86, 'length': 60, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #输出E"主体
 
             {'instruction_type': 'MATMUL',      'fields': {'src0': 5, 'src1': 2, 'dst': 4, 'mode': 1}},                      #V=S'B+E"
             {'instruction_type': 'ENCDEC',      'fields': {'src': 6, 'dst': 7, 'mode': 0}},                      #encode u
@@ -81,7 +81,7 @@ class Encaps640Generator(FrodoAlgorithmBase):
             {'instruction_tyoe': 'ABSORB',      'fields': {'addr':0xa88, 'length':8, 'ram_index': 1}},
             {'instruction_type': 'ABSORB',      'fields': {'addr':0xfdf, 'length':16, 'ram_index': 0}},
             {'instruction_type': 'HASH_RND',     'fields': {'length': 192 , 'mode': 0}},
-            {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfe3, 'length':16, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #挤出ss
+            {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfe3, 'length':8, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #挤出ss
         ]
 
 

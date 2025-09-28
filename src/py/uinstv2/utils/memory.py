@@ -171,6 +171,17 @@ class MemoryReader:
                 raise IndexError(f"Address {word_index} out of memory range")
             offset = (idx % elems_per_word) * bit_width_for_offset
             value = (self.words[word_index] >> offset) & mask
+            
+            # 当位宽是16或15时，调整内部2个8bit的字节顺序
+            if data_bit_width in (15, 16):
+                # 交换低8位和高8位
+                low_byte = value & 0xFF
+                high_byte = (value >> 8) & 0xFF
+                value = (low_byte << 8) | high_byte  # 真正交换：低字节放高位，高字节放低位
+                # 对于15位，确保最高位为0
+                if data_bit_width == 15:
+                    value &= 0x7FFF
+            
             if signed:
                 # 进行有符号扩展
                 sign_bit = 1 << (15 if data_bit_width == 15 else data_bit_width - 1)
