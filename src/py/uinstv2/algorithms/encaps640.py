@@ -48,10 +48,10 @@ class Encaps640Generator(FrodoAlgorithmBase):
 
             #生成seedSE
             {'instruction_type': 'ABSORB',       'fields': {'addr':0xa81, 'length': 16, 'ram_index': 1,'ram_reset': 1}},             #吸收Pkh
-            {'instruction_type': 'ABSORB',       'fields': {'addr':0xfcb, 'length': 16, 'ram_index': 0,'ram_reset': 0}},             #吸收seedse,256bit
+            {'instruction_type': 'ABSORB',       'fields': {'addr':0xfcb, 'length': 16, 'ram_index': 0,'ram_reset': 0}},             #吸收u,128bit
             {'instruction_type': 'ABSORB',       'fields': {'addr':0xa95, 'length': 32, 'ram_index': 1,'ram_reset': 0}},             #吸收seedse,256bit
             {'instruction_type': 'HASH_RND',     'fields': {'length': 64 , 'mode': 0}},                                 #执行吸收,长度为512bit
-            {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfc1, 'length':32, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #挤出seedSE
+            {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfc1, 'length':16, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #挤出seedSE
             {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfdf, 'length':16, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #挤出k
 
             {'instruction_type': 'ABSORB_BYTE',  'fields': {'byte': 0x96}},                                             #吸收96                       
@@ -68,17 +68,17 @@ class Encaps640Generator(FrodoAlgorithmBase):
             {'instruction_type': 'SQUEEZE' ,     'fields': {'addr':0xa86, 'length': 60, 'ram_index': 1, 'mode': 0b10,'sample': 1}}, #输出E"主体
 
             {'instruction_type': 'MATMUL',      'fields': {'src0': 5, 'src1': 2, 'dst': 4, 'mode': 1}},                      #V=S'B+E"
-            {'instruction_type': 'ENCDEC',      'fields': {'src': 6, 'dst': 7, 'mode': 0}},                      #encode u
+            {'instruction_type': 'ENCDEC',      'fields': {'src0': 6, 'dst': 7, 'mode': 0}},                      #encode u
             {'instruction_type': 'MATADD',      'fields': {'src0': 4, 'dst': 7, 'mode': 1}},                       #C=V+enu
 
-            {'instruction_type': 'AMATMUL',     'fields': {'src0': 1, 'src1': 2, 'dst': 3, 'mode': 1}},                      #B'=S'A+E'
+            {'instruction_type': 'AMATMUL',     'fields': {'src0': 1, 'src1': 2, 'dst': 3, 'mode': 0}},                      #B'=S'A+E'
 
-            {'instruction_type': 'ABSORB_STRM', 'fields': {'addr': 0x10, 'loop': 57, 'mode': 0b00,'flag15to8': 1,'mode':1,'ram_reset':1}},    #吸收B'的主体
+            {'instruction_type': 'ABSORB_STRM', 'fields': {'addr': 0x10, 'loop': 57, 'flag15to8': 1,'mode':1,'ram_reset':1}},    #吸收B'的主体
             {'instruction_type': 'HASH_RND',     'fields': {'length': 168 , 'mode': 0}},
             {'instruction_type': 'ABSORB',      'fields': {'addr':0x10, 'length': 25, 'ram_index': 0x00,'flag15to8': 1,'mode':1}},
-            {'instruction_tyoe': 'ABSORB',      'fields': {'addr':0xa85,'length':24,'ram_index': 1,'flag15to8': 0}},
-            {'instruction_tyoe': 'HASH_RND',     'fields': {'length': 168 , 'mode': 0}},                                 #假装执行一次吸收
-            {'instruction_tyoe': 'ABSORB',      'fields': {'addr':0xa88, 'length':8, 'ram_index': 1}},
+            {'instruction_type': 'ABSORB',      'fields': {'addr':0xa85,'length':24,'ram_index': 1,'flag15to8': 0}},
+            {'instruction_type': 'HASH_RND',     'fields': {'length': 168 , 'mode': 0}},                                 #假装执行一次吸收
+            {'instruction_type': 'ABSORB',      'fields': {'addr':0xa88, 'length':8, 'ram_index': 1}},
             {'instruction_type': 'ABSORB',      'fields': {'addr':0xfdf, 'length':16, 'ram_index': 0}},
             {'instruction_type': 'HASH_RND',     'fields': {'length': 192 , 'mode': 0}},
             {'instruction_type': 'SQUEEZE',      'fields': {'addr':0xfe3, 'length':8, 'ram_index': 0, 'mode': 0b10,'sample': 0}}, #挤出ss

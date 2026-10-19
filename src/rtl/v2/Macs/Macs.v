@@ -1,3 +1,6 @@
+// `include "add/adder_frodo.v"
+// `include "PE_Simple.v"
+
 module Macs (
     input               clk,
     input               rstn,
@@ -63,6 +66,8 @@ module Macs (
         end
     end
 
+`ifdef USE_DSP
+    // 使用DSP时使用PE_Simple
     PE_Simple u_pe_0(
         .clk(clk),
         .rstn(rstn),
@@ -107,41 +112,52 @@ module Macs (
         .en(en),
         .level(level)
     );
-    // ADDER_FRODO u_pe_0(
-    //     .clk(clk),
-    //     .rstn(rstn),
-    //     .en(en),
-    //     .in_a(b_0),
-    //     .in_b(a_temp_0),
-    //     .in_c(c_0),
-    //     .result(result[15:0])
-    // );
-    //     ADDER_FRODO u_pe_1(
-    //     .clk(clk),
-    //     .rstn(rstn),
-    //     .en(en),
-    //     .in_a(b_1),
-    //     .in_b(a_temp_1),
-    //     .in_c(c_1),
-    //     .result(result[31:16])
-    // );
-    //     ADDER_FRODO u_pe_2(
-    //     .clk(clk),
-    //     .rstn(rstn),
-    //     .en(en),
-    //     .in_a(b_2),
-    //     .in_b(a_temp_2),
-    //     .in_c(c_2),
-    //     .result(result[47:32])
-    // );
-    //     ADDER_FRODO u_pe_3(
-    //     .clk(clk),
-    //     .rstn(rstn),
-    //     .en(en),
-    //     .in_a(b_3),
-    //     .in_b(a_temp_3),
-    //     .in_c(c_3),
-    //     .result(result[63:48])
-    // );
+`else
+    // 不使用DSP时使用ADDER_FRODO
+    ADDER_FRODO u_pe_0(
+        .clk(clk),
+        .rstn(rstn),
+        .en(en),
+        .in_a(b_0),
+        .in_b_(a_temp_0),
+        .in_c(c_0),
+        .result(result[15:0]),
+        .done(done),
+        .level(level)
+    );
+    
+    ADDER_FRODO u_pe_1(
+        .clk(clk),
+        .rstn(rstn),
+        .en(en),
+        .in_a(b_1),
+        .in_b_(a_temp_1),
+        .in_c(c_1),
+        .result(result[31:16]),
+        .level(level)
+    );
+    
+    ADDER_FRODO u_pe_2(
+        .clk(clk),
+        .rstn(rstn),
+        .en(en),
+        .in_a(b_2),
+        .in_b_(a_temp_2),
+        .in_c(c_2),
+        .result(result[47:32]),
+        .level(level)
+    );
+    
+    ADDER_FRODO u_pe_3(
+        .clk(clk),
+        .rstn(rstn),
+        .en(en),
+        .in_a(b_3),
+        .in_b_(a_temp_3),
+        .in_c(c_3),
+        .result(result[63:48]),
+        .level(level)
+    );
+`endif
 
 endmodule

@@ -30,6 +30,8 @@ class FrodoAssembler:
             'ENCDEC': {
                 'description': '编码/解码操作',
                 'required_fields': ['src0', 'dst', 'mode'],
+                'optional_fields': [],
+                'default_values': {},
                 'fields': {
                     'src0': {'bits': 4, 'offset': 24},             # 源操作数0 (位27-24)
                     'dst': {'bits': 4, 'offset': 16},             # 目标操作数 (位19-16)
@@ -40,8 +42,8 @@ class FrodoAssembler:
             'MATMUL': {
                 'description': '矩阵乘法',
                 'required_fields': ['src0', 'src1', 'dst'],
-                'optional_fields': ['mode'],
-                'default_values': {'mode': 0},
+                'optional_fields': ['mode', 'signal'],
+                'default_values': {'mode': 0, 'signal': 0},
                 'fields': {
                     'src0': {'bits': 4, 'offset': 24},             # 源操作数0 (位27-24)
                     'src1': {'bits': 4, 'offset': 20},            # 源操作数1 (位23-20)
@@ -54,7 +56,7 @@ class FrodoAssembler:
             'MOV': {
                 'description': '数据移动',
                 'required_fields': ['src0', 'dst', 'length'],
-                'default_values': {'mode': 0, 'signal': 0},
+                'default_values': {'mode': 0},
                 'fields': {
                     'src0': {'bits': 4, 'offset': 24},             # 源操作数0 (位27-24)
                     'length_high': {'bits': 4, 'offset': 20},      # length[9:6] (位23-20)

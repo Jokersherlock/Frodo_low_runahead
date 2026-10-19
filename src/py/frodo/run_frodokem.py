@@ -6,7 +6,7 @@ kem = FrodoKEM('FrodoKEM-640-SHAKE')
 rng = NISTKAT.NISTRNG()
 kem.randombytes = rng.randombytes
 pk, sk = kem.kem_keygen()
-# ct,ss = kem.kem_encaps(pk)
+ct,ss = kem.kem_encaps(pk)
 # kem.kem_decaps(sk,ct)
 
 

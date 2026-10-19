@@ -32,5 +32,6 @@
 // 取消注释使用综合模式（IP核）
 // `define USE_IP_CORE
 
+`define USE_DSP
 
 `endif

@@ -153,7 +153,7 @@ module Control(
             FINISH:begin
                 case (mode_reg)
                 `KEYGEN:begin
-                    if(level_reg == `FRODO_640 &&pc == 8'd22)begin
+                    if(level_reg == `FRODO_640 &&pc == 8'd12)begin
                         state_nxt = IDLE;
                         valid     = 1'b1;
                     end
@@ -170,7 +170,7 @@ module Control(
                     end
                 end
                 `ENCAP:begin
-                    if(level_reg == `FRODO_640 &&pc == 8'd12)begin
+                    if(level_reg == `FRODO_640 &&pc == 8'd60)begin
                         state_nxt = IDLE;
                         valid     = 1'b1;
                     end
@@ -187,7 +187,7 @@ module Control(
                     end
                 end
                 `DECAP:begin
-                    if(level_reg == `FRODO_640 &&pc == 8'd12)begin
+                    if(level_reg == `FRODO_640 &&pc == 8'd103)begin
                         state_nxt = IDLE;
                         valid     = 1'b1;
                     end
@@ -231,7 +231,7 @@ module Control(
                         pc <= 8'd45;
                     end
                     else if(level_reg == `FRODO_640 &&mode_reg == `ENCAP)begin
-                        pc <= 8'd13;
+                        pc <= 8'd22;
                     end
                     else if(level_reg == `FRODO_976 &&mode_reg == `ENCAP)begin
                         pc <= 8'd45;
@@ -240,7 +240,7 @@ module Control(
                         pc <= 8'd84;
                     end
                     else if(level_reg == `FRODO_640 &&mode_reg == `DECAP)begin
-                        pc <= 8'd84;
+                        pc <= 8'd61;
                     end
                     else if(level_reg == `FRODO_976 &&mode_reg == `DECAP)begin
                         pc <= 8'd128;

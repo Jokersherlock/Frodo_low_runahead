@@ -566,7 +566,7 @@ class FrodoKEM(object):
         mu_salt = self.randombytes(self.len_mu_bytes + self.len_salt_bytes)
         mu = mu_salt[0:self.len_mu_bytes]
         salt = mu_salt[self.len_mu_bytes:self.len_mu_bytes + self.len_salt_bytes]
-        #print('mu',mu.hex().upper())
+        print('mu',mu.hex().upper())
         #print('salt',salt.hex().upper())
         self.__print_intermediate_value("mu", mu)
         self.__print_intermediate_value("salt", salt)

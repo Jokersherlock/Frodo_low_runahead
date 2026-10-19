@@ -14,7 +14,7 @@ module Encode (
     localparam SHIFT976 = 3;  // 3
     localparam SHIFT1344= 4;  // 4
 
-    reg [63:0] shift_reg;
+    (* keep = "true" *) reg [63:0] shift_reg;
     reg [1:0] bia;
 
     always @(posedge clk or negedge rstn) begin

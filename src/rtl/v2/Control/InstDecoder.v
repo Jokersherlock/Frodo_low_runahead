@@ -202,7 +202,7 @@ module InstDecoder (
                 end
                 `ABSORB_STRM:begin
                     loop_0 <= {inst_reg[`INST_WIDTH-27:`INST_WIDTH-28],inst_reg[`INST_WIDTH-13:`INST_WIDTH-18]};
-                    loop_1 <= 8'b0;
+                    loop_1 <= level == `FRODO_640 ? 8'd168 : 8'd136;
                     loop_2 <= 8'b0;
                     loop_3 <= 8'b0;
                 end

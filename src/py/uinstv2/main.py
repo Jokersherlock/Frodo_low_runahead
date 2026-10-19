@@ -9,6 +9,14 @@ sys.path.append(os.path.dirname(__file__))
 from core.memory import Memory, MemoryData
 from core.instruction_merger import InstructionMerger
 from algorithms.keygen640 import Keygen640Generator
+from algorithms.encaps640 import Encaps640Generator
+from algorithms.decaps640 import Decaps640Generator
+from algorithms.keygen976 import Keygen976Generator
+from algorithms.encaps976 import Encaps976Generator
+from algorithms.decaps976 import Decaps976Generator
+from algorithms.keygen1344 import Keygen1344Generator
+from algorithms.encaps1344 import Encaps1344Generator
+from algorithms.decaps1344 import Decaps1344Generator
 from instructions.uinst_assembler import UinstAssembler
 
 
@@ -102,12 +110,30 @@ print("\n正在生成inst.bin文件...")
 
 # 创建keygen640算法实例
 keygen640 = Keygen640Generator()
+encaps640 = Encaps640Generator()
+decaps640 = Decaps640Generator()
+keygen976 = Keygen976Generator()
+encaps976 = Encaps976Generator()
+decaps976 = Decaps976Generator()
+keygen1344 = Keygen1344Generator()
+encaps1344 = Encaps1344Generator()
+decaps1344 = Decaps1344Generator()
+
+
 
 # 创建指令合并器
 merger = InstructionMerger()
 
 # 添加keygen640算法到合并器
 merger.add_algorithm(keygen640, "keygen640")
+merger.add_algorithm(encaps640, "encaps640")
+merger.add_algorithm(decaps640, "decaps640")
+merger.add_algorithm(keygen976, "keygen976")
+merger.add_algorithm(encaps976, "encaps976")
+merger.add_algorithm(decaps976, "decaps976")
+merger.add_algorithm(keygen1344, "keygen1344")
+merger.add_algorithm(encaps1344, "encaps1344")
+merger.add_algorithm(decaps1344, "decaps1344")
 
 # 生成并保存inst.bin文件
 output_file = merger.save_to_file(filename="inst.bin")

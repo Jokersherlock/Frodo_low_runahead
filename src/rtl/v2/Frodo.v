@@ -7,7 +7,8 @@ module Frodo #(
     input rstn,
     input [1:0] level,
     input [1:0] mode,
-    input start
+    input start,
+    output valid
 );
     wire [63:0] mem0_rd_data_0,mem0_rd_data_1,mem1_rd_data_0,mem1_rd_data_1;
     wire mem0_wr_en_0,mem0_wr_en_1,mem1_wr_en_0,mem1_wr_en_1;
@@ -77,6 +78,7 @@ module Frodo #(
         .mode_reg(mode_reg),
         .start(start),
         .pc(pc),
+        .valid(valid),
         .mem0_rd_data_0(mem0_rd_data_0),
         .mem0_rd_data_1(mem0_rd_data_1),
         .mem1_rd_data_0(mem1_rd_data_0),
@@ -353,6 +355,8 @@ module Frodo #(
         .rstn(rstn),
         .load_en(load_en),
         .consume_en(consume_en),
+        .clr(inst_done),
+        .level(level_reg),
         .data_in(R0_16),
         .dout16(data_encode)
     );
@@ -363,6 +367,8 @@ module Frodo #(
         .rstn(rstn),
         .load_en(load_en),
         .consume_en(consume_en),
+        .clr(inst_done),
+        .level(level_reg),
         .data_in(R0_16),
         .dout16(data_decode)
     );

@@ -46,7 +46,7 @@ class Keygen640Generator(FrodoAlgorithmBase):
             {'instruction_type': 'ABSORB',       'fields': {'addr':0xfc1, 'length': 16, 'ram_index': 0x00}},             #假装吸收seedA
             {'instruction_type': 'ABSORB',       'fields': {'addr':0xa81, 'length': 164, 'ram_index': 0x00,'flag15to8': 1}},             #假装吸收B的首轮部分,19*64=1216,1216/16=76
             {'instruction_type': 'HASH_RND',     'fields': {'length': 168 , 'mode': 0}},                                 #假装执行的第一轮吸收
-            {'instruction_type': 'ABSORB_STRM','fields': {'addr': 0xa81, 'loop': 57, 'mode': 0b00,'flag15to8': 1}},       #假装吸收B的主体,60*1344/16=5040
+            {'instruction_type': 'ABSORB_STRM','fields': {'addr': 0xa81, 'loop': 57, 'mode': 0,'flag15to8': 1}},       #假装吸收B的主体,60*1344/8=5040
             {'instruction_type': 'HASH_RND',     'fields': {'length': 168 , 'mode': 0}},                                 #假装执行一次吸收
             {'instruction_type': 'ABSORB',       'fields': {'addr':0xa81, 'length': 17, 'ram_index': 0x00,'flag15to8': 1}},   #假装吸收B的剩余,8*640-76-5040=4,4*16=64
             {'instruction_type': 'HASH_RND',     'fields': {'length': 8 , 'mode': 0}},                                 #执行一次吸收
